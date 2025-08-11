@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (error) throw error;
 
     // Force a full refresh for a clean state
-    window.location.href = "/";
+    window.location.href = "/dashboard";
   };
 
   const signUp = async (email: string, password: string) => {

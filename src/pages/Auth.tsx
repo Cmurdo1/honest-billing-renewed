@@ -53,7 +53,7 @@ const Auth = () => {
   }, [pageTitle]);
 
   useEffect(() => {
-    if (user && !loading) navigate("/", { replace: true });
+    if (user && !loading) navigate("/dashboard", { replace: true });
   }, [user, loading, navigate]);
 
   const onSubmit = async (e: React.FormEvent) => {
