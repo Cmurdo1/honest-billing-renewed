@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -13,9 +14,7 @@ const Index = () => {
         {user ? (
           <Button variant="secondary" onClick={signOut}>Sign out</Button>
         ) : (
-          <Button asChild>
-            <Link to="/auth">Sign in</Link>
-          </Button>
+          <Button onClick={() => navigate("/auth")}>Sign in</Button>
         )}
       </div>
     </div>
@@ -23,4 +22,5 @@ const Index = () => {
 };
 
 export default Index;
+
 
