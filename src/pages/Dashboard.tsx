@@ -1,6 +1,11 @@
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import Overview from "./dashboard/Overview";
+import Clients from "./dashboard/Clients";
+import Invoices from "./dashboard/Invoices";
+import Settings from "./dashboard/Settings";
 
 const updateSeo = (title: string, description: string) => {
   document.title = title;
@@ -27,19 +32,35 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="px-6 py-4 border-b">
+      <header className="px-6 py-4 border-b flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <div>
+          <Button variant="secondary" onClick={signOut}>Sign out</Button>
+        </div>
       </header>
-      <main className="container mx-auto px-4 py-8">
-        <section className="rounded-lg border bg-card p-6 shadow-sm">
-          <h2 className="text-lg font-medium">Welcome{user?.email ? `, ${user.email}` : ""}</h2>
-          <p className="text-muted-foreground mt-1">
-            You’re signed in. This is where your client and invoice data will live.
-          </p>
-          <div className="mt-6">
-            <Button variant="secondary" onClick={signOut}>Sign out</Button>
-          </div>
-        </section>
+
+      <main>
+        <Tabs defaultValue="overview" className="container mx-auto px-4 py-8">
+          <TabsList className="mb-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="clients">Clients</TabsTrigger>
+            <TabsTrigger value="invoices">Invoices</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview">
+            <Overview />
+          </TabsContent>
+          <TabsContent value="clients">
+            <Clients />
+          </TabsContent>
+          <TabsContent value="invoices">
+            <Invoices />
+          </TabsContent>
+          <TabsContent value="settings">
+            <Settings />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
