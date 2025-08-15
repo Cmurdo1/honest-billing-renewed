@@ -1,10 +1,13 @@
 import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import SubscriptionStatus from "@/components/SubscriptionStatus";
 import Overview from "./dashboard/Overview";
 import Clients from "./dashboard/Clients";
 import Invoices from "./dashboard/Invoices";
+import Billing from "./dashboard/Billing";
 import Settings from "./dashboard/Settings";
 
 const updateSeo = (title: string, description: string) => {
@@ -22,6 +25,8 @@ const updateSeo = (title: string, description: string) => {
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get('tab') || 'overview';
 
   useEffect(() => {
     updateSeo(
@@ -33,18 +38,22 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="px-6 py-4 border-b flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <SubscriptionStatus />
+        </div>
         <div>
           <Button variant="secondary" onClick={signOut}>Sign out</Button>
         </div>
       </header>
 
       <main>
-        <Tabs defaultValue="overview" className="container mx-auto px-4 py-8">
+        <Tabs defaultValue={defaultTab} className="container mx-auto px-4 py-8">
           <TabsList className="mb-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="clients">Clients</TabsTrigger>
             <TabsTrigger value="invoices">Invoices</TabsTrigger>
+            <TabsTrigger value="billing">Billing</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
@@ -56,6 +65,9 @@ const Dashboard = () => {
           </TabsContent>
           <TabsContent value="invoices">
             <Invoices />
+          </TabsContent>
+          <TabsContent value="billing">
+            <Billing />
           </TabsContent>
           <TabsContent value="settings">
             <Settings />

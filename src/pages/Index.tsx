@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { stripeProducts } from "@/stripe-config";
 
 // Small helper to handle SEO for the landing page
 function updateSeo(title: string, description: string, canonicalHref?: string) {
@@ -85,34 +86,15 @@ const Index = () => {
         cta: user ? () => navigate("/dashboard") : () => navigate("/auth"),
         ctaLabel: user ? "Use Free plan" : "Get started free",
       },
-      {
-        name: "Pro",
-        price: "$12",
+      ...stripeProducts.map((product, index) => ({
+        name: product.name,
+        price: `$${product.price}`,
         period: "/month",
-        highlight: true,
-        features: [
-          "Unlimited clients",
-          "Custom branding & logo",
-          "Saved items & taxes",
-          "Priority support",
-        ],
-        cta: user ? () => navigate("/dashboard") : () => navigate("/auth"),
-        ctaLabel: user ? "Upgrade to Pro" : "Sign in to upgrade",
-      },
-      {
-        name: "Business",
-        price: "$29",
-        period: "/month",
-        highlight: false,
-        features: [
-          "Team access (3 seats)",
-          "Advanced reporting",
-          "Multiple currencies",
-          "Export to CSV/PDF",
-        ],
-        cta: user ? () => navigate("/dashboard") : () => navigate("/auth"),
-        ctaLabel: user ? "Upgrade to Business" : "Sign in to upgrade",
-      },
+        highlight: index === 0, // Make first product (Pro) highlighted
+        features: getFeaturesByPlan(product.name),
+        cta: user ? () => navigate("/dashboard?tab=billing") : () => navigate("/auth"),
+        ctaLabel: user ? `Upgrade to ${product.name}` : "Sign in to upgrade",
+      })),
     ],
     [navigate, user]
   );
@@ -283,6 +265,25 @@ const Index = () => {
       </footer>
     </div>
   );
+};
+
+const getFeaturesByPlan = (planName: string): string[] => {
+  const features = {
+    Pro: [
+      "Unlimited clients",
+      "Custom branding & logo", 
+      "Saved items & taxes",
+      "Priority support",
+    ],
+    Business: [
+      "Team access (3 seats)",
+      "Advanced reporting",
+      "Multiple currencies", 
+      "Export to CSV/PDF",
+    ]
+  };
+
+  return features[planName as keyof typeof features] || [];
 };
 
 export default Index;
