@@ -29,7 +29,7 @@ const Billing = () => {
     ? getProductByPriceId(subscription.price_id)
     : null;
 
-  const isActiveSubscription = subscription?.subscription_status === 'active';
+  const isActiveSubscription = subscription?.status === 'active';
 
   const handleUpgrade = (priceId: string) => {
     createCheckout.mutate({ priceId, mode: 'subscription' });
@@ -67,7 +67,7 @@ const Billing = () => {
                     {currentProduct?.name || 'Unknown Plan'}
                   </span>
                   <Badge variant={isActiveSubscription ? 'default' : 'secondary'}>
-                    {subscription.subscription_status}
+                    {subscription.status}
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -77,8 +77,8 @@ const Billing = () => {
                   <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
                     <span>
-                      {subscription.cancel_at_period_end ? 'Expires' : 'Renews'} on{' '}
-                      {new Date(subscription.current_period_end * 1000).toLocaleDateString()}
+                      Renews on{' '}
+                      {new Date(subscription.current_period_end!).toLocaleDateString()}
                     </span>
                   </div>
                 )}

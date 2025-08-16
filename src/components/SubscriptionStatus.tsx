@@ -23,7 +23,7 @@ const SubscriptionStatus = () => {
   }
 
   const product = getProductByPriceId(subscription.price_id);
-  const isActive = subscription.subscription_status === 'active';
+  const isActive = subscription.status === 'active';
 
   if (!product) {
     return (
@@ -46,7 +46,7 @@ const SubscriptionStatus = () => {
     >
       {getIcon()}
       {product.name}
-      {!isActive && ` (${subscription.subscription_status})`}
+      {!isActive && ` (${subscription.status})`}
     </Badge>
   );
 };

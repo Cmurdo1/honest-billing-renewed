@@ -4,15 +4,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 export interface SubscriptionData {
-  customer_id: string;
-  subscription_id: string | null;
-  subscription_status: string;
+  id: string;
+  user_id: string;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  status: string | null;
   price_id: string | null;
-  current_period_start: number | null;
-  current_period_end: number | null;
-  cancel_at_period_end: boolean;
-  payment_method_brand: string | null;
-  payment_method_last4: string | null;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export const useSubscription = () => {
@@ -25,6 +26,7 @@ export const useSubscription = () => {
       const { data, error } = await supabase
         .from('stripe_user_subscriptions')
         .select('*')
+        .eq('user_id', user.id)
         .maybeSingle();
 
       if (error) {

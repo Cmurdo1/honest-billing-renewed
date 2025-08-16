@@ -1,0 +1,18 @@
+# Cloudflare Pages deployment configuration for HonestInvoice
+name = "honestinvoice"
+compatibility_date = "2024-08-15"
+pages_build_output_dir = "dist"
+
+[build]
+command = "npm run build"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+
+[env.production]
+vars = { NODE_ENV = "production" }
+
+[env.preview]
+vars = { NODE_ENV = "preview" }
