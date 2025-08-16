@@ -6,6 +6,13 @@ pages_build_output_dir = "dist"
 [build]
 command = "npm run build"
 
+# Redirect www to non-www (industry standard)
+[[redirects]]
+from = "https://www.honestinvoice.com/*"
+to = "https://honestinvoice.com/:splat"
+status = 301
+
+# SPA routing - must be last
 [[redirects]]
 from = "/*"
 to = "/index.html"
