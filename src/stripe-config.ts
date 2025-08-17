@@ -10,21 +10,12 @@ export interface StripeProduct {
 
 export const stripeProducts: StripeProduct[] = [
   {
-    id: 'prod_STuTlUrwzbpkJ9',
-    priceId: 'price_1RYweXEUGnEA4Zn8W34OgVye',
+    id: 'pro_tier',
+    priceId: 'pro_tier',
     name: 'Pro',
-    description: 'pro membership',
+    description: 'Pro membership with advanced features',
     mode: 'subscription',
-    price: 9.00,
-    currency: 'USD'
-  },
-  {
-    id: 'prod_STuUBI2us0kbQX',
-    priceId: 'price_1RYwfcEUGnEA4Zn8B0Duhxs6',
-    name: 'Business',
-    description: 'business membership',
-    mode: 'subscription',
-    price: 19.00,
+    price: 4.99,
     currency: 'USD'
   }
 ];

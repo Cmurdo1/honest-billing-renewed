@@ -92,8 +92,8 @@ const Index = () => {
         period: "/month",
         highlight: index === 0, // Make first product (Pro) highlighted
         features: getFeaturesByPlan(product.name),
-        cta: user ? () => navigate("/dashboard?tab=billing") : () => navigate("/auth"),
-        ctaLabel: user ? `Upgrade to ${product.name}` : "Sign in to upgrade",
+        cta: () => window.open("https://buy.stripe.com/aFaeVd2ub23leHdf3p7kc03", "_blank"),
+        ctaLabel: `Get ${product.name}`,
       })),
     ],
     [navigate, user]
@@ -272,14 +272,9 @@ const getFeaturesByPlan = (planName: string): string[] => {
     Pro: [
       "Unlimited clients",
       "Custom branding & logo", 
-      "Saved items & taxes",
-      "Priority support",
-    ],
-    Business: [
-      "Team access (3 seats)",
       "Advanced reporting",
-      "Multiple currencies", 
-      "Export to CSV/PDF",
+      "Priority support",
+      "Export to PDF",
     ]
   };
 

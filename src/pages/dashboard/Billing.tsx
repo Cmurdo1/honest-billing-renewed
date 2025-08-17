@@ -31,8 +31,8 @@ const Billing = () => {
 
   const isActiveSubscription = subscription?.status === 'active';
 
-  const handleUpgrade = (priceId: string) => {
-    createCheckout.mutate({ priceId, mode: 'subscription' });
+  const handleUpgrade = () => {
+    window.open("https://buy.stripe.com/aFaeVd2ub23leHdf3p7kc03", "_blank");
   };
 
   if (subscriptionLoading) {
@@ -101,7 +101,7 @@ const Billing = () => {
         <h2 className="text-2xl font-bold mb-6">
           {subscription ? 'Upgrade Your Plan' : 'Choose Your Plan'}
         </h2>
-        <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-1 max-w-md">
           {stripeProducts.map((product) => {
             const isCurrentPlan = currentProduct?.id === product.id;
             const isDowngrade = currentProduct && currentProduct.price > product.price;
@@ -147,7 +147,7 @@ const Billing = () => {
                     className="w-full"
                     variant={isCurrentPlan ? 'secondary' : 'default'}
                     disabled={isCurrentPlan || createCheckout.isPending || isDowngrade}
-                    onClick={() => handleUpgrade(product.priceId)}
+                    onClick={handleUpgrade}
                   >
                     {createCheckout.isPending ? (
                       'Processing...'
@@ -182,17 +182,10 @@ const getFeaturesByPlan = (planName: string): string[] => {
     Pro: [
       'Unlimited clients',
       'Custom branding & logo',
-      'Saved items & taxes',
+      'Advanced reporting',
       'Priority support',
-      'Advanced reporting'
-    ],
-    Business: [
-      'Everything in Pro',
-      'Team access (3 seats)',
-      'Multiple currencies',
-      'Export to CSV/PDF',
-      'API access',
-      'White-label solution'
+      'Export to PDF',
+      'Saved items & taxes'
     ]
   };
 
