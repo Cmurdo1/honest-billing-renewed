@@ -9,6 +9,8 @@ import Clients from "./dashboard/Clients";
 import Invoices from "./dashboard/Invoices";
 import Billing from "./dashboard/Billing";
 import Settings from "./dashboard/Settings";
+import Analytics from "./dashboard/Analytics";
+import CustomBranding from "./dashboard/CustomBranding";
 
 const updateSeo = (title: string, description: string) => {
   document.title = title;
@@ -49,10 +51,12 @@ const Dashboard = () => {
 
       <main>
         <Tabs defaultValue={defaultTab} className="container mx-auto px-4 py-8">
-          <TabsList className="mb-4">
+          <TabsList className="mb-4 grid grid-cols-7 w-full">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="clients">Clients</TabsTrigger>
             <TabsTrigger value="invoices">Invoices</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="branding">Branding</TabsTrigger>
             <TabsTrigger value="billing">Billing</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
@@ -65,6 +69,12 @@ const Dashboard = () => {
           </TabsContent>
           <TabsContent value="invoices">
             <Invoices />
+          </TabsContent>
+          <TabsContent value="analytics">
+            <Analytics />
+          </TabsContent>
+          <TabsContent value="branding">
+            <CustomBranding />
           </TabsContent>
           <TabsContent value="billing">
             <Billing />

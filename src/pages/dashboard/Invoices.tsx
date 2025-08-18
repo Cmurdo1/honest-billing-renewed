@@ -9,12 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
+import { useProAccess } from "@/hooks/useProAccess";
+import { Download, Send, Crown } from "lucide-react";
 
 const sb = supabase as any;
 
 const Invoices = () => {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { isPro } = useProAccess();
 
   const [number, setNumber] = useState("");
   const [clientId, setClientId] = useState<string>("");
@@ -163,12 +166,13 @@ const Invoices = () => {
                 <TableHead>Total</TableHead>
                 <TableHead>Issued</TableHead>
                 <TableHead>Due</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {invoices.isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6}>Loading…</TableCell>
+                  <TableCell colSpan={7}>Loading…</TableCell>
                 </TableRow>
               ) : invoices.data && invoices.data.length > 0 ? (
                 invoices.data.map((inv: any) => (
@@ -179,11 +183,39 @@ const Invoices = () => {
                     <TableCell>${Number(inv.total).toFixed(2)}</TableCell>
                     <TableCell>{inv.issue_date}</TableCell>
                     <TableCell>{inv.due_date || "—"}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2 flex-wrap">
+                        <Button size="sm" variant="outline">Edit</Button>
+                        {isPro ? (
+                          <>
+                            <Button size="sm" variant="secondary" className="flex items-center gap-1">
+                              <Download className="h-3 w-3" />
+                              PDF
+                            </Button>
+                            <Button size="sm" variant="default" className="flex items-center gap-1">
+                              <Send className="h-3 w-3" />
+                              Send
+                            </Button>
+                          </>
+                        ) : (
+                          <Button 
+                            size="sm" 
+                            variant="secondary" 
+                            onClick={() => window.open("https://buy.stripe.com/aFaeVd2ub23leHdf3p7kc03", "_blank")}
+                            className="text-xs flex items-center gap-1"
+                          >
+                            <Crown className="h-3 w-3" />
+                            Pro: Export
+                          </Button>
+                        )}
+                        <Button size="sm" variant="destructive">Delete</Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6}>No invoices yet</TableCell>
+                  <TableCell colSpan={7}>No invoices yet</TableCell>
                 </TableRow>
               )}
             </TableBody>
