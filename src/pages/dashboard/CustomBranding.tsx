@@ -100,7 +100,7 @@ const CustomBranding = () => {
               <CardContent className="space-y-4">
                 <div>
                   <Label>Company Logo</Label>
-                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                  <div className="border-2 border-dashed border-muted-foreground/20 hover:border-primary/40 transition-colors rounded-lg p-6 text-center">
                     {formData.logoUrl ? (
                       <div className="space-y-2">
                         <img 
@@ -112,7 +112,7 @@ const CustomBranding = () => {
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        <Upload className="h-8 w-8 mx-auto text-gray-400" />
+                        <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
                         <p className="text-sm text-muted-foreground">
                           Upload your company logo
                         </p>
@@ -197,7 +197,7 @@ const CustomBranding = () => {
                 </div>
                 <div className="border-t pt-4" style={{ borderColor: formData.secondaryColor }}>
                   <h4 className="font-semibold mb-2">INVOICE #001</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Sample invoice content...</p>
+                  <p className="text-sm text-muted-foreground">Sample invoice content...</p>
                 </div>
                 {formData.footerText && (
                   <div className="mt-6 pt-4 border-t text-center text-sm" style={{ 

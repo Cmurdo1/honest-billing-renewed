@@ -127,12 +127,15 @@ const Index = () => {
       <main>
         {/* Hero */}
         <section className="container mx-auto py-20 md:py-28 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight max-w-3xl mx-auto">
-            Invoicing that’s honest, fast, and effortless
-          </h1>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 blur-3xl -z-10"></div>
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight max-w-3xl mx-auto bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+              Invoicing that's honest, fast, and effortless
+            </h1>
+          </div>
           <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Manage clients, create professional invoices, and get paid quickly.
-            Everything you need, nothing you don’t.
+            Everything you need, nothing you don't.
           </p>
           <div className="mt-8 flex items-center justify-center gap-3">
             {user ? (
@@ -148,10 +151,14 @@ const Index = () => {
 
         {/* Features */}
         <section id="features" className="container mx-auto py-12 md:py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Everything you need to invoice professionally</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Simple tools that work together to help you manage your business and get paid faster.</p>
+          </div>
           <div className="grid gap-6 md:grid-cols-3">
-            <Card>
+            <Card className="border-primary/20 hover:border-primary/40 transition-colors">
               <CardHeader>
-                <CardTitle>Client management</CardTitle>
+                <CardTitle className="text-primary">Client management</CardTitle>
                 <CardDescription>All your client details in one place.</CardDescription>
               </CardHeader>
               <CardContent>
@@ -169,9 +176,9 @@ const Index = () => {
                 </ul>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="border-primary/20 hover:border-primary/40 transition-colors">
               <CardHeader>
-                <CardTitle>Invoice creation</CardTitle>
+                <CardTitle className="text-primary">Invoice creation</CardTitle>
                 <CardDescription>Create beautiful invoices in seconds.</CardDescription>
               </CardHeader>
               <CardContent>
@@ -189,9 +196,9 @@ const Index = () => {
                 </ul>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="border-primary/20 hover:border-primary/40 transition-colors">
               <CardHeader>
-                <CardTitle>Stay organized</CardTitle>
+                <CardTitle className="text-primary">Stay organized</CardTitle>
                 <CardDescription>Track status and keep everything tidy.</CardDescription>
               </CardHeader>
               <CardContent>
@@ -215,7 +222,7 @@ const Index = () => {
         {/* Pricing */}
         <section id="pricing" className="container mx-auto py-16 md:py-24">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold">Simple, honest pricing</h2>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Simple, honest pricing</h2>
             <p className="mt-2 text-muted-foreground">Start free and upgrade anytime.</p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
@@ -282,5 +289,3 @@ const getFeaturesByPlan = (planName: string): string[] => {
 };
 
 export default Index;
-
-

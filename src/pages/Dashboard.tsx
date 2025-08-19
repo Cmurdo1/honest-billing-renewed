@@ -39,9 +39,12 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="px-6 py-4 border-b flex items-center justify-between">
+      <header className="px-6 py-4 border-b border-primary/20 flex items-center justify-between bg-gradient-to-r from-background to-primary/5">
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">HI</span>
+            <h1 className="text-2xl font-semibold text-primary">Dashboard</h1>
+          </div>
           <SubscriptionStatus />
         </div>
         <div>

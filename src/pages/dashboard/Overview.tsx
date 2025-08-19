@@ -43,7 +43,7 @@ const Overview = () => {
     <section className="space-y-6">
       {/* Subscription Status Banner */}
       {!proLoading && (
-        <Card className={`border-2 ${isPro ? 'border-primary bg-primary/5' : 'border-yellow-400 bg-yellow-50 dark:bg-yellow-950/20'}`}>
+        <Card className={`border-2 ${isPro ? 'border-primary bg-primary/5' : 'border-accent bg-accent/10'}`}>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -59,12 +59,12 @@ const Overview = () => {
                   </>
                 ) : (
                   <>
-                    <Crown className="h-6 w-6 text-yellow-600" />
+                    <Crown className="h-6 w-6 text-accent" />
                     <div>
-                      <h3 className="font-semibold text-yellow-800 dark:text-yellow-400">
+                      <h3 className="font-semibold text-accent">
                         Upgrade to Pro
                       </h3>
-                      <p className="text-sm text-yellow-700 dark:text-yellow-500">
+                      <p className="text-sm text-muted-foreground">
                         Unlock advanced features like custom branding, analytics, and PDF exports
                       </p>
                     </div>
