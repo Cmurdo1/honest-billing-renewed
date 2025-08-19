@@ -150,6 +150,109 @@ export type Database = {
           },
         ]
       }
+      recurring_invoice_items: {
+        Row: {
+          amount: number | null
+          created_at: string
+          description: string
+          id: string
+          position: number
+          quantity: number
+          recurring_invoice_id: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          description: string
+          id?: string
+          position?: number
+          quantity?: number
+          recurring_invoice_id: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          description?: string
+          id?: string
+          position?: number
+          quantity?: number
+          recurring_invoice_id?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_recurring_invoice_items_recurring_invoice"
+            columns: ["recurring_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "recurring_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recurring_invoices: {
+        Row: {
+          client_id: string
+          created_at: string
+          frequency: Database["public"]["Enums"]["recurring_frequency"]
+          id: string
+          is_active: boolean
+          last_generated_date: string | null
+          next_due_date: string
+          notes: string | null
+          subtotal: number
+          tax: number
+          template_number: string
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          frequency?: Database["public"]["Enums"]["recurring_frequency"]
+          id?: string
+          is_active?: boolean
+          last_generated_date?: string | null
+          next_due_date: string
+          notes?: string | null
+          subtotal?: number
+          tax?: number
+          template_number: string
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          frequency?: Database["public"]["Enums"]["recurring_frequency"]
+          id?: string
+          is_active?: boolean
+          last_generated_date?: string | null
+          next_due_date?: string
+          notes?: string | null
+          subtotal?: number
+          tax?: number
+          template_number?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_recurring_invoices_client"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stripe_user_subscriptions: {
         Row: {
           created_at: string
@@ -228,6 +331,7 @@ export type Database = {
     }
     Enums: {
       invoice_status: "draft" | "sent" | "paid" | "overdue" | "void"
+      recurring_frequency: "weekly" | "monthly" | "quarterly" | "annually"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -356,6 +460,7 @@ export const Constants = {
   public: {
     Enums: {
       invoice_status: ["draft", "sent", "paid", "overdue", "void"],
+      recurring_frequency: ["weekly", "monthly", "quarterly", "annually"],
     },
   },
 } as const

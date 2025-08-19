@@ -7,7 +7,7 @@ import SubscriptionStatus from "@/components/SubscriptionStatus";
 import Overview from "./dashboard/Overview";
 import Clients from "./dashboard/Clients";
 import Invoices from "./dashboard/Invoices";
-import Billing from "./dashboard/Billing";
+import RecurringInvoices from "./dashboard/RecurringInvoices";
 import Settings from "./dashboard/Settings";
 import Analytics from "./dashboard/Analytics";
 import CustomBranding from "./dashboard/CustomBranding";
@@ -60,7 +60,7 @@ const Dashboard = () => {
             <TabsTrigger value="invoices">Invoices</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="branding">Branding</TabsTrigger>
-            <TabsTrigger value="billing">Billing</TabsTrigger>
+            <TabsTrigger value="recurring">Recurring</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
@@ -79,8 +79,8 @@ const Dashboard = () => {
           <TabsContent value="branding">
             <CustomBranding />
           </TabsContent>
-          <TabsContent value="billing">
-            <Billing />
+          <TabsContent value="recurring">
+            <RecurringInvoices />
           </TabsContent>
           <TabsContent value="settings">
             <Settings />
