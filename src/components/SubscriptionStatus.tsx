@@ -1,10 +1,13 @@
 import { useSubscription } from '@/hooks/useStripe';
+import { useRefreshSubscription } from '@/hooks/useRefreshSubscription';
 import { getProductByPriceId } from '@/stripe-config';
 import { Badge } from '@/components/ui/badge';
-import { Crown, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Crown, Zap, RefreshCw } from 'lucide-react';
 
 const SubscriptionStatus = () => {
   const { data: subscription, isLoading } = useSubscription();
+  const refreshSubscription = useRefreshSubscription();
 
   if (isLoading) {
     return (
@@ -40,14 +43,25 @@ const SubscriptionStatus = () => {
   };
 
   return (
-    <Badge 
-      variant={isActive ? 'default' : 'secondary'} 
-      className="flex items-center gap-1"
-    >
-      {getIcon()}
-      {product.name}
-      {!isActive && ` (${subscription.status})`}
-    </Badge>
+    <div className="flex items-center gap-2">
+      <Badge 
+        variant={isActive ? 'default' : 'secondary'} 
+        className="flex items-center gap-1"
+      >
+        {getIcon()}
+        {product.name}
+        {!isActive && ` (${subscription.status})`}
+      </Badge>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => refreshSubscription.mutate()}
+        disabled={refreshSubscription.isPending}
+        className="h-6 w-6 p-0"
+      >
+        <RefreshCw className={`h-3 w-3 ${refreshSubscription.isPending ? 'animate-spin' : ''}`} />
+      </Button>
+    </div>
   );
 };
 

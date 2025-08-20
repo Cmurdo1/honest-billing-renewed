@@ -138,13 +138,13 @@ async function syncCustomerFromStripe(customerId: string) {
     // TODO verify if needed
     if (subscriptions.data.length === 0) {
       console.info(`No active subscriptions found for customer: ${customerId}`);
-      const { error: noSubError } = await supabase.from('stripe_subscriptions').upsert(
+      const { error: noSubError } = await supabase.from('stripe_user_subscriptions').upsert(
         {
-          customer_id: customerId,
-          subscription_status: 'not_started',
+          stripe_customer_id: customerId,
+          status: 'not_started',
         },
         {
-          onConflict: 'customer_id',
+          onConflict: 'stripe_customer_id',
         },
       );
 
@@ -158,24 +158,17 @@ async function syncCustomerFromStripe(customerId: string) {
     const subscription = subscriptions.data[0];
 
     // store subscription state
-    const { error: subError } = await supabase.from('stripe_subscriptions').upsert(
+    const { error: subError } = await supabase.from('stripe_user_subscriptions').upsert(
       {
-        customer_id: customerId,
-        subscription_id: subscription.id,
+        stripe_customer_id: customerId,
+        stripe_subscription_id: subscription.id,
         price_id: subscription.items.data[0].price.id,
-        current_period_start: subscription.current_period_start,
-        current_period_end: subscription.current_period_end,
-        cancel_at_period_end: subscription.cancel_at_period_end,
-        ...(subscription.default_payment_method && typeof subscription.default_payment_method !== 'string'
-          ? {
-              payment_method_brand: subscription.default_payment_method.card?.brand ?? null,
-              payment_method_last4: subscription.default_payment_method.card?.last4 ?? null,
-            }
-          : {}),
+        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
         status: subscription.status,
       },
       {
-        onConflict: 'customer_id',
+        onConflict: 'stripe_customer_id',
       },
     );
 
