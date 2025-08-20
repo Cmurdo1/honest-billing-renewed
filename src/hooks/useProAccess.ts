@@ -1,9 +1,32 @@
-import { useSubscription } from './useStripe';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useProAccess = () => {
-  const { data: subscription, isLoading } = useSubscription();
+  const { user } = useAuth();
   
-  const isPro = subscription?.status === 'active' && subscription?.price_id === 'pro_tier';
+  const { data: subscription, isLoading } = useQuery({
+    queryKey: ['subscription', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching subscription:', error);
+        return null;
+      }
+      
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+  
+  const isPro = subscription?.status === 'active' && subscription?.plan_name === 'Pro';
   
   return {
     isPro,

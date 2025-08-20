@@ -150,6 +150,48 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          full_name: string | null
+          id: string
+          plan: Database["public"]["Enums"]["user_plan_tier"]
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id: string
+          plan?: Database["public"]["Enums"]["user_plan_tier"]
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["user_plan_tier"]
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      "public.user_plan_tier": {
+        Row: {
+          created_at: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       recurring_invoice_items: {
         Row: {
           amount: number | null
@@ -292,6 +334,51 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean | null
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan_name: string | null
+          price_id: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_name?: string | null
+          price_id?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_name?: string | null
+          price_id?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           address: string | null
@@ -332,6 +419,7 @@ export type Database = {
     Enums: {
       invoice_status: "draft" | "sent" | "paid" | "overdue" | "void"
       recurring_frequency: "weekly" | "monthly" | "quarterly" | "annually"
+      user_plan_tier: "free" | "pro" | "enterprise"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -461,6 +549,7 @@ export const Constants = {
     Enums: {
       invoice_status: ["draft", "sent", "paid", "overdue", "void"],
       recurring_frequency: ["weekly", "monthly", "quarterly", "annually"],
+      user_plan_tier: ["free", "pro", "enterprise"],
     },
   },
 } as const
