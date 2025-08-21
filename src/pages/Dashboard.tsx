@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -41,10 +41,10 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <header className="px-6 py-4 border-b border-primary/20 flex items-center justify-between bg-gradient-to-r from-background to-primary/5">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+          <Link to="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity" aria-label="Go to Dashboard">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">HI</span>
             <h1 className="text-2xl font-semibold text-primary">Dashboard</h1>
-          </div>
+          </Link>
           <SubscriptionStatus />
         </div>
         <div>

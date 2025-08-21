@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Verify Your Email Address - HonestInvoice</title>
+  <style type="text/css">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    body, html { margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f7f9fc; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table { border-collapse: collapse; mso-table-lspace: 0; mso-table-rspace: 0; width: 100%; }
+    td { padding: 0; }
+    img { border: 0; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+    a { text-decoration: none; color: #4CAF50; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .header { background-color: #fff; padding: 20px; text-align: center; border-bottom: 1px solid #eee; }
+    .logo { max-width: 180px; height: auto; display: block; margin: 0 auto; }
+    .content-area { padding: 30px 40px; }
+    .heading { font-size: 28px; font-weight: 700; color: #333; margin: 0 0 20px; text-align: center; }
+    .paragraph { font-size: 16px; margin-bottom: 20px; line-height: 1.7; color: #555; }
+    .button-wrapper { text-align: center; margin: 30px 0; }
+    .button { display: inline-block; background-color: #4CAF50; color: #fff !important; padding: 15px 30px; border-radius: 8px; font-size: 18px; font-weight: 600; box-shadow: 0 4px 10px rgba(76,175,80,0.3); }
+    .button:hover { background-color: #45a049; }
+    .link-text { font-size: 14px; color: #888; word-break: break-all; }
+    .footer { background-color: #f0f3f6; color: #777; padding: 25px 40px; text-align: center; font-size: 13px; }
+    .footer p { margin: 0; padding: 5px 0; }
+    @media only screen and (max-width: 620px) {
+      .container { width: 100% !important; border-radius: 0 !important; }
+      .content-area { padding: 20px !important; }
+      .heading { font-size: 24px !important; }
+      .paragraph { font-size: 15px !important; }
+      .button { padding: 12px 25px !important; font-size: 16px !important; }
+      .footer { border-radius: 0 !important; }
+    }
+  </style>
+</head>
+<body>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f7f9fc;">
+    <tr>
+      <td align="center" style="padding:20px 0;">
+        <table class="container" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td class="header">
+              <img class="logo" src="https://image2url.com/images/1755768830023-f16bf4f4-e1d0-4ebe-9ec7-3e4d40911ee6.jpeg" alt="HonestInvoice Logo" />
+            </td>
+          </tr>
+          <tr>
+            <td class="content-area">
+              <p class="heading">Just one more step to get started!</p>
+              <p class="paragraph">Hi there,</p>
+              <p class="paragraph">
+                Thank you for signing up for an account with <strong>HonestInvoice</strong>.
+                To activate your account and start exploring all our features, please verify your email address.
+              </p>
+              <div class="button-wrapper">
+                <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email" class="button" target="_blank">Verify Your Email Now</a>
+              </div>
+              <p class="paragraph" style="text-align:center;">
+                If the button above doesn't work, copy and paste this link into your browser:
+              </p>
+              <p class="link-text" style="text-align:center;">
+                <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email" target="_blank">{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email</a>
+              </p>
+              <p class="paragraph">
+                This link is valid for 24 hours. If you did not register for an account with us, please disregard this email.
+              </p>
+              <p class="paragraph" style="margin-bottom:0;">
+                Best regards,<br />
+                The Team at HonestInvoice
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td class="footer">
+              <p>You received this email because you recently signed up for an account at HonestInvoice.com.</p>
+              <p>&copy; 2025 HonestInvoice. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+

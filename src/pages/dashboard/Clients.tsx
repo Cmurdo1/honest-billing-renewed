@@ -8,12 +8,19 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
+import { useProAccess } from "@/hooks/useProAccess";
+import { Badge } from "@/components/ui/badge";
 
 const sb = supabase as any;
+
+const FREE_CLIENT_LIMIT = 5;
+// Use environment variable for Stripe checkout URL
+const STRIPE_CHECKOUT_URL = import.meta.env.VITE_STRIPE_CHECKOUT_URL;
 
 const Clients = () => {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { isPro, isLoading: subLoading } = useProAccess();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -34,9 +41,23 @@ const Clients = () => {
     },
   });
 
+  const limitReached = !isPro && !!clients.data && clients.data.length >= FREE_CLIENT_LIMIT;
+
   const addClient = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Not authenticated");
+      if (!isPro) {
+        // Re-check limit on mutation to avoid races
+        const { count, error: countError } = await sb
+          .from("clients")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", user.id);
+        if (countError) throw countError;
+        if ((count ?? 0) >= FREE_CLIENT_LIMIT) {
+          throw new Error("Free plan limit reached. Upgrade to Pro for unlimited clients.");
+        }
+      }
+
       const payload = {
         user_id: user.id,
         name,
@@ -60,6 +81,21 @@ const Clients = () => {
 
   return (
     <section className="space-y-6">
+      {!subLoading && limitReached && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="py-4 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm">
+              <Badge variant="secondary">Free Plan</Badge>
+              <span>
+                You reached the free limit of {FREE_CLIENT_LIMIT} clients.
+                Upgrade to Pro for unlimited clients.
+              </span>
+            </div>
+            <Button onClick={() => window.open(STRIPE_CHECKOUT_URL, "_blank")}>Upgrade</Button>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Add Client</CardTitle>
@@ -89,7 +125,7 @@ const Clients = () => {
               <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} />
             </div>
             <div className="md:col-span-2">
-              <Button type="submit" disabled={addClient.isPending}>Save Client</Button>
+              <Button type="submit" disabled={addClient.isPending || limitReached}>Save Client</Button>
             </div>
           </form>
         </CardContent>

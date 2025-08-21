@@ -53,6 +53,12 @@ const Auth = () => {
   }, [pageTitle]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromVerification = params.get("verified") === "1";
+
+    // If the user arrives from email verification, keep them on /auth
+    if (fromVerification) return;
+
     if (user && !loading) navigate("/dashboard", { replace: true });
   }, [user, loading, navigate]);
 

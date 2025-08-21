@@ -1,10 +1,12 @@
 import { useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { stripeProducts } from "@/stripe-config";
+// If STRIPE_CHECKOUT_URL is needed, define it here or import the correct value.
+const STRIPE_CHECKOUT_URL = "https://your-stripe-checkout-url.com"; // Replace with your actual Stripe Checkout URL
 
 // Small helper to handle SEO for the landing page
 function updateSeo(title: string, description: string, canonicalHref?: string) {
@@ -92,7 +94,7 @@ const Index = () => {
         period: "/month",
         highlight: index === 0, // Make first product (Pro) highlighted
         features: getFeaturesByPlan(product.name),
-        cta: () => window.open("https://buy.stripe.com/aFaeVd2ub23leHdf3p7kc03", "_blank"),
+        cta: () => window.open(STRIPE_CHECKOUT_URL, "_blank"),
         ctaLabel: `Get ${product.name}`,
       })),
     ],
@@ -103,10 +105,10 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       <header className="border-b">
         <div className="container mx-auto flex items-center justify-between py-4">
-          <div className="flex items-center gap-2">
+          <Link to="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity" aria-label="Go to Dashboard">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">HI</span>
             <span className="font-semibold">HonestInvoice</span>
-          </div>
+          </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
             <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-foreground">Features</button>
             <button onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-foreground">Pricing</button>

@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "name": "honestinvoice",
+  "public": true,
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/signin", "destination": "/auth", "permanent": true },
+    { "source": "/sign-in", "destination": "/auth", "permanent": true },
+    { "source": "/login", "destination": "/auth", "permanent": true },
+    { "source": "/register", "destination": "/auth", "permanent": true },
+    { "source": "/signup", "destination": "/auth", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
+}

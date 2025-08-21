@@ -52,7 +52,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    // After email verification, return users to the sign-in screen and mark the flow
+    const redirectUrl = `${window.location.origin}/auth?verified=1`;
     const { error } = await supabase.auth.signUp({
       email,
       password,

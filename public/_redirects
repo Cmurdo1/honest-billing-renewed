@@ -17,3 +17,4 @@ https://www.honestinvoice.com/* https://honestinvoice.com/:splat 301!
 
 # 4) SPA routing fallback (must be last)
 /*           /index.html 200
+
