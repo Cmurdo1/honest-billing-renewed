@@ -6,6 +6,7 @@ import { useProAccess } from "@/hooks/useProAccess";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Crown, TrendingUp, Users, FileText, ArrowRight } from "lucide-react";
+import { config } from "@/lib/config";
 
 const sb = supabase as any;
 
@@ -152,8 +153,8 @@ const Overview = () => {
               </div>
             </div>
             <div className="text-center mt-6">
-              <Button 
-                onClick={() => window.open("https://buy.stripe.com/aFaeVd2ub23leHdf3p7kc03", "_blank")}
+              <Button
+                onClick={() => window.open(config.stripe.checkoutUrl, "_blank")}
                 size="lg"
                 className="flex items-center gap-2"
               >

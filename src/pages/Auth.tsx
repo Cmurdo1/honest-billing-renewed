@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
+import { signInSchema, signUpSchema } from "@/lib/validations";
 
 const updateSeo = (title: string, description: string) => {
   document.title = title;
@@ -65,6 +66,19 @@ const Auth = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Validate form data
+      const formData = { email, password };
+      const schema = mode === "signin" ? signInSchema : signUpSchema;
+      const validation = schema.safeParse(formData);
+
+      if (!validation.success) {
+        toast({
+          title: "Validation error",
+          description: validation.error.errors[0].message,
+        });
+        return;
+      }
+
       if (mode === "signin") {
         await signIn(email, password);
       } else {

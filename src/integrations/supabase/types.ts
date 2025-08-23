@@ -294,29 +294,51 @@ export type Database = {
       }
       user_settings: {
         Row: {
-          address: string | null
-          company_name: string | null
-          created_at: string
-          currency: string
-          display_name: string | null
-          updated_at: string
+          id: string
           user_id: string
+          display_name: string | null
+          company_name: string | null
+          company_logo_url: string | null
+          address: string | null
+          phone: string | null
+          website: string | null
+          currency: string
+          tax_rate: number | null
+          invoice_terms: string | null
+          invoice_footer: string | null
+          created_at: string
+          updated_at: string
         }
         Insert: {
-          address?: string | null
-          company_name?: string | null
-          created_at?: string
-          currency?: string
-          display_name?: string | null
-          updated_at?: string
+          id?: string
           user_id: string
+          display_name?: string | null
+          company_name?: string | null
+          company_logo_url?: string | null
+          address?: string | null
+          phone?: string | null
+          website?: string | null
+          currency?: string
+          tax_rate?: number | null
+          invoice_terms?: string | null
+          invoice_footer?: string | null
+          created_at?: string
+          updated_at?: string
         }
         Update: {
-          address?: string | null
-          company_name?: string | null
-          created_at?: string
-          currency?: string
+          id?: string
+          user_id?: string
           display_name?: string | null
+          company_name?: string | null
+          company_logo_url?: string | null
+          address?: string | null
+          phone?: string | null
+          website?: string | null
+          currency?: string
+          tax_rate?: number | null
+          invoice_terms?: string | null
+          invoice_footer?: string | null
+          created_at?: string
           updated_at?: string
           user_id?: string
         }

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, CreditCard, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
+import { config } from '@/lib/config';
 
 const Billing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -32,7 +33,7 @@ const Billing = () => {
   const isActiveSubscription = subscription?.status === 'active';
 
   const handleUpgrade = () => {
-    window.open("https://buy.stripe.com/aFaeVd2ub23leHdf3p7kc03", "_blank");
+    window.open(config.stripe.checkoutUrl, "_blank");
   };
 
   if (subscriptionLoading) {

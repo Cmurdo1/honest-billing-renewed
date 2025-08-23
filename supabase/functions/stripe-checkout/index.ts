@@ -1,5 +1,16 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
+
+// Deno type declarations for Edge Runtime
+declare const Deno: {
+  env: {
+    get(key: string): string | undefined;
+  };
+  serve(handler: (request: Request) => Response | Promise<Response>): void;
+};
+
+// @ts-ignore - Deno npm imports
 import Stripe from 'npm:stripe@17.7.0';
+// @ts-ignore - Deno npm imports
 import { createClient } from 'npm:@supabase/supabase-js@2.49.1';
 
 const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');

@@ -1,5 +1,15 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
+
+// Deno type declarations for Edge Runtime
+declare const Deno: {
+  env: {
+    get(key: string): string | undefined;
+  };
+  serve(handler: (request: Request) => Response | Promise<Response>): void;
+};
+// @ts-ignore - Deno npm imports
 import Stripe from 'npm:stripe@17.7.0';
+// @ts-ignore - Deno npm imports
 import { createClient } from 'npm:@supabase/supabase-js@2.49.1';
 
 const stripeSecret = Deno.env.get('STRIPE_SECRET_KEY')!;
@@ -44,7 +54,10 @@ Deno.serve(async (req) => {
       return new Response(`Webhook signature verification failed: ${error.message}`, { status: 400 });
     }
 
-    EdgeRuntime.waitUntil(handleEvent(event));
+    // Process the event asynchronously but don't wait for completion
+    // This allows Stripe to receive a quick 200 response
+    // Note: In Supabase Edge Functions, we handle the event synchronously to ensure proper error handling
+    await handleEvent(event);
 
     return Response.json({ received: true });
   } catch (error: any) {
@@ -54,80 +67,150 @@ Deno.serve(async (req) => {
 });
 
 async function handleEvent(event: Stripe.Event) {
+  const eventId = event.id;
+  const eventType = event.type;
+  
+  console.info(`Processing webhook event: ${eventType} (${eventId})`);
+  
   const stripeData = event?.data?.object ?? {};
 
   if (!stripeData) {
+    console.warn(`No data object in event: ${eventId}`);
     return;
   }
 
   if (!('customer' in stripeData)) {
+    console.warn(`No customer field in event: ${eventId}`);
     return;
   }
 
   // for one time payments, we only listen for the checkout.session.completed event
   if (event.type === 'payment_intent.succeeded' && event.data.object.invoice === null) {
+    console.info(`Skipping payment_intent.succeeded without invoice: ${eventId}`);
     return;
   }
 
   const { customer: customerId } = stripeData;
 
   if (!customerId || typeof customerId !== 'string') {
-    console.error(`No customer received on event: ${JSON.stringify(event)}`);
-  } else {
-    let isSubscription = true;
+    console.error(`No valid customer ID in event ${eventId}: ${JSON.stringify(event)}`);
+    return;
+  }
 
-    if (event.type === 'checkout.session.completed') {
-      const { mode } = stripeData as Stripe.Checkout.Session;
-
-      isSubscription = mode === 'subscription';
-
-      console.info(`Processing ${isSubscription ? 'subscription' : 'one-time payment'} checkout session`);
+  try {
+    // Handle different event types
+    switch (eventType) {
+      case 'checkout.session.completed':
+        await handleCheckoutSessionCompleted(stripeData as Stripe.Checkout.Session, customerId, eventId);
+        break;
+      
+      case 'invoice.payment_succeeded':
+      case 'customer.subscription.updated':
+      case 'customer.subscription.created':
+        console.info(`Processing subscription event ${eventType} for customer: ${customerId}`);
+        await syncCustomerFromStripe(customerId, eventId);
+        break;
+      
+      case 'customer.subscription.deleted':
+        console.info(`Processing subscription deletion for customer: ${customerId}`);
+        await handleSubscriptionDeleted(customerId, eventId);
+        break;
+      
+      default:
+        console.info(`Unhandled event type: ${eventType}`);
     }
-
-    const { mode, payment_status } = stripeData as Stripe.Checkout.Session;
-
-    if (isSubscription) {
-      console.info(`Starting subscription sync for customer: ${customerId}`);
-      await syncCustomerFromStripe(customerId);
-    } else if (mode === 'payment' && payment_status === 'paid') {
-      try {
-        // Extract the necessary information from the session
-        const {
-          id: checkout_session_id,
-          payment_intent,
-          amount_subtotal,
-          amount_total,
-          currency,
-        } = stripeData as Stripe.Checkout.Session;
-
-        // Insert the order into the stripe_orders table
-        const { error: orderError } = await supabase.from('stripe_orders').insert({
-          checkout_session_id,
-          payment_intent_id: payment_intent,
-          customer_id: customerId,
-          amount_subtotal,
-          amount_total,
-          currency,
-          payment_status,
-          status: 'completed', // assuming we want to mark it as completed since payment is successful
-        });
-
-        if (orderError) {
-          console.error('Error inserting order:', orderError);
-          return;
-        }
-        console.info(`Successfully processed one-time payment for session: ${checkout_session_id}`);
-      } catch (error) {
-        console.error('Error processing one-time payment:', error);
-      }
-    }
+  } catch (error) {
+    console.error(`Error handling event ${eventId}:`, error);
+    throw error; // Re-throw to trigger retry
   }
 }
 
-// based on the excellent https://github.com/t3dotgg/stripe-recommendations
-async function syncCustomerFromStripe(customerId: string) {
+async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session, customerId: string, eventId: string) {
+  const { mode, payment_status } = session;
+  const isSubscription = mode === 'subscription';
+  
+  console.info(`Processing ${isSubscription ? 'subscription' : 'one-time payment'} checkout session: ${session.id}`);
+  
+  if (isSubscription) {
+    // Wait a moment for Stripe to fully process the subscription
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    await syncCustomerFromStripe(customerId, eventId);
+  } else if (mode === 'payment' && payment_status === 'paid') {
+    await handleOneTimePayment(session, customerId, eventId);
+  }
+}
+
+async function handleOneTimePayment(session: Stripe.Checkout.Session, customerId: string, eventId: string) {
   try {
-    // fetch latest subscription data from Stripe
+    const {
+      id: checkout_session_id,
+      payment_intent,
+      amount_subtotal,
+      amount_total,
+      currency,
+      payment_status
+    } = session;
+
+    const { error: orderError } = await supabase.from('stripe_orders').insert({
+      checkout_session_id,
+      payment_intent_id: payment_intent,
+      customer_id: customerId,
+      amount_subtotal,
+      amount_total,
+      currency,
+      payment_status,
+      status: 'completed',
+    });
+
+    if (orderError) {
+      console.error(`Error inserting order for event ${eventId}:`, orderError);
+      throw orderError;
+    }
+    
+    console.info(`Successfully processed one-time payment for session: ${checkout_session_id}`);
+  } catch (error) {
+    console.error(`Error processing one-time payment for event ${eventId}:`, error);
+    throw error;
+  }
+}
+
+async function handleSubscriptionDeleted(customerId: string, eventId: string) {
+  try {
+    const { error } = await supabase
+      .from('stripe_subscriptions')
+      .update({ 
+        status: 'canceled',
+        updated_at: new Date().toISOString()
+      })
+      .eq('customer_id', customerId);
+    
+    if (error) {
+      console.error(`Error updating subscription status for deleted subscription (${eventId}):`, error);
+      throw error;
+    }
+    
+    // Invalidate cache
+    await invalidateSubscriptionCache(customerId);
+    
+    console.info(`Successfully handled subscription deletion for customer: ${customerId}`);
+  } catch (error) {
+    console.error(`Error handling subscription deletion for event ${eventId}:`, error);
+    throw error;
+  }
+}
+
+// Enhanced subscription sync with retry logic and customer mapping verification
+async function syncCustomerFromStripe(customerId: string, eventId?: string, retryCount = 0): Promise<void> {
+  const maxRetries = 3;
+  const retryDelay = 1000 * Math.pow(2, retryCount); // Exponential backoff
+  
+  try {
+    console.info(`Syncing subscription for customer ${customerId} (attempt ${retryCount + 1}/${maxRetries + 1})`);
+    
+    // Ensure customer mapping exists
+    await ensureCustomerMapping(customerId);
+    
+    // Fetch latest subscription data from Stripe
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       limit: 1,
@@ -135,57 +218,127 @@ async function syncCustomerFromStripe(customerId: string) {
       expand: ['data.default_payment_method'],
     });
 
-    // TODO verify if needed
     if (subscriptions.data.length === 0) {
-      console.info(`No active subscriptions found for customer: ${customerId}`);
-      const { error: noSubError } = await supabase.from('stripe_subscriptions').upsert(
-        {
-          customer_id: customerId,
-          status: 'not_started',
-        },
-        {
-          onConflict: 'customer_id',
-        },
-      );
-
-      if (noSubError) {
-        console.error('Error updating subscription status:', noSubError);
-        throw new Error('Failed to update subscription status in database');
-      }
+      console.info(`No subscriptions found for customer: ${customerId}`);
+      await updateSubscriptionStatus(customerId, 'not_started', null);
+      return;
     }
 
-    // assumes that a customer can only have a single subscription
+    // Get the most recent subscription
     const subscription = subscriptions.data[0];
+    console.info(`Found subscription ${subscription.id} with status: ${subscription.status}`);
 
-    // store subscription state
-    const { error: subError } = await supabase.from('stripe_subscriptions').upsert(
-      {
-        customer_id: customerId,
-        subscription_id: subscription.id,
-        price_id: subscription.items.data[0].price.id,
-        current_period_start: subscription.current_period_start,
-        current_period_end: subscription.current_period_end,
-        cancel_at_period_end: subscription.cancel_at_period_end,
-        ...(subscription.default_payment_method && typeof subscription.default_payment_method !== 'string'
-          ? {
-              payment_method_brand: subscription.default_payment_method.card?.brand ?? null,
-              payment_method_last4: subscription.default_payment_method.card?.last4 ?? null,
-            }
-          : {}),
-        status: subscription.status,
-      },
-      {
-        onConflict: 'customer_id',
-      },
-    );
-
-    if (subError) {
-      console.error('Error syncing subscription:', subError);
-      throw new Error('Failed to sync subscription in database');
-    }
-    console.info(`Successfully synced subscription for customer: ${customerId}`);
+    // Update subscription data
+    await updateSubscriptionData(customerId, subscription);
+    
+    // Invalidate cache to ensure frontend gets updated data
+    await invalidateSubscriptionCache(customerId);
+    
+    console.info(`Successfully synced subscription for customer: ${customerId} (event: ${eventId || 'manual'})`);
   } catch (error) {
-    console.error(`Failed to sync subscription for customer ${customerId}:`, error);
+    console.error(`Failed to sync subscription for customer ${customerId} (attempt ${retryCount + 1}):`, error);
+    
+    if (retryCount < maxRetries) {
+      console.warn(`Retrying sync for customer ${customerId} in ${retryDelay}ms`);
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
+      return await syncCustomerFromStripe(customerId, eventId, retryCount + 1);
+    }
+    
+    throw new Error(`Failed to sync subscription after ${maxRetries + 1} attempts: ${error.message}`);
+  }
+}
+
+async function ensureCustomerMapping(customerId: string): Promise<void> {
+  // Check if customer mapping exists
+  const { data: existingCustomer } = await supabase
+    .from('stripe_customers')
+    .select('user_id')
+    .eq('customer_id', customerId)
+    .eq('deleted_at', null)
+    .maybeSingle();
+  
+  if (existingCustomer) {
+    return; // Mapping already exists
+  }
+  
+  console.warn(`No customer mapping found for ${customerId}`);
+  
+  // Try to find user_id from Stripe customer metadata
+  try {
+    const stripeCustomer = await stripe.customers.retrieve(customerId);
+    
+    if (stripeCustomer.deleted) {
+      throw new Error(`Stripe customer ${customerId} is deleted`);
+    }
+    
+    const userId = stripeCustomer.metadata?.userId || stripeCustomer.metadata?.user_id;
+    
+    if (userId) {
+      console.info(`Creating customer mapping: ${customerId} -> ${userId}`);
+      const { error } = await supabase.from('stripe_customers').insert({
+        user_id: userId,
+        customer_id: customerId
+      });
+      
+      if (error && !error.message.includes('duplicate')) {
+        throw error;
+      }
+    } else {
+      console.error(`No user_id found in Stripe customer ${customerId} metadata`);
+    }
+  } catch (error) {
+    console.error(`Error ensuring customer mapping for ${customerId}:`, error);
+    // Don't throw here - continue with sync even if mapping creation fails
+  }
+}
+
+async function updateSubscriptionStatus(customerId: string, status: string, subscriptionData?: Stripe.Subscription | null): Promise<void> {
+  const updateData: any = {
+    customer_id: customerId,
+    status: status as any,
+    updated_at: new Date().toISOString()
+  };
+  
+  if (subscriptionData) {
+    updateData.subscription_id = subscriptionData.id;
+    updateData.price_id = subscriptionData.items.data[0]?.price.id || null;
+    updateData.current_period_start = subscriptionData.current_period_start;
+    updateData.current_period_end = subscriptionData.current_period_end;
+    updateData.cancel_at_period_end = subscriptionData.cancel_at_period_end;
+    
+    if (subscriptionData.default_payment_method && typeof subscriptionData.default_payment_method !== 'string') {
+      updateData.payment_method_brand = subscriptionData.default_payment_method.card?.brand ?? null;
+      updateData.payment_method_last4 = subscriptionData.default_payment_method.card?.last4 ?? null;
+    }
+  }
+  
+  const { error } = await supabase.from('stripe_subscriptions').upsert(
+    updateData,
+    { onConflict: 'customer_id' }
+  );
+  
+  if (error) {
+    console.error(`Error updating subscription for ${customerId}:`, error);
     throw error;
+  }
+}
+
+async function updateSubscriptionData(customerId: string, subscription: Stripe.Subscription): Promise<void> {
+  await updateSubscriptionStatus(customerId, subscription.status, subscription);
+}
+
+async function invalidateSubscriptionCache(customerId: string): Promise<void> {
+  try {
+    // Call the database function to invalidate cache
+    const { error } = await supabase.rpc('invalidate_subscription_cache', {
+      p_customer_id: customerId
+    });
+    
+    if (error) {
+      console.warn(`Error invalidating cache for ${customerId}:`, error);
+      // Don't throw - cache invalidation failure shouldn't break the sync
+    }
+  } catch (error) {
+    console.warn(`Cache invalidation error for ${customerId}:`, error);
   }
 }

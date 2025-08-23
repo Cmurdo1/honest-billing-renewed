@@ -10,12 +10,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner";
 import { useProAccess } from "@/hooks/useProAccess";
 import { Badge } from "@/components/ui/badge";
+import { clientSchema, ClientFormData } from "@/lib/validations";
+import { config } from "@/lib/config";
 
 const sb = supabase as any;
 
-const FREE_CLIENT_LIMIT = 5;
-// Use environment variable for Stripe checkout URL
-const STRIPE_CHECKOUT_URL = import.meta.env.VITE_STRIPE_CHECKOUT_URL;
+const FREE_CLIENT_LIMIT = config.limits.freeClientLimit;
 
 const Clients = () => {
   const { user } = useAuth();
@@ -31,13 +31,13 @@ const Clients = () => {
     queryKey: ["clients", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await sb
+      const { data, error } = await supabase
         .from("clients")
         .select("*")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as any[];
+      return data;
     },
   });
 
@@ -46,9 +46,17 @@ const Clients = () => {
   const addClient = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Not authenticated");
+
+      // Validate form data
+      const formData: ClientFormData = { name, email, company, address };
+      const validation = clientSchema.safeParse(formData);
+      if (!validation.success) {
+        throw new Error(validation.error.errors[0].message);
+      }
+
       if (!isPro) {
         // Re-check limit on mutation to avoid races
-        const { count, error: countError } = await sb
+        const { count, error: countError } = await supabase
           .from("clients")
           .select("*", { count: "exact", head: true })
           .eq("user_id", user.id);
@@ -60,12 +68,12 @@ const Clients = () => {
 
       const payload = {
         user_id: user.id,
-        name,
-        email: email || null,
-        company: company || null,
-        address: address || null,
+        name: validation.data.name,
+        email: validation.data.email || null,
+        company: validation.data.company || null,
+        address: validation.data.address || null,
       };
-      const { error } = await sb.from("clients").insert([payload]);
+      const { error } = await supabase.from("clients").insert([payload]);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -91,7 +99,7 @@ const Clients = () => {
                 Upgrade to Pro for unlimited clients.
               </span>
             </div>
-            <Button onClick={() => window.open(STRIPE_CHECKOUT_URL, "_blank")}>Upgrade</Button>
+            <Button onClick={() => window.open(config.stripe.checkoutUrl, "_blank")}>Upgrade</Button>
           </CardContent>
         </Card>
       )}

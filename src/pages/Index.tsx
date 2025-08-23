@@ -5,8 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { stripeProducts } from "@/stripe-config";
-// If STRIPE_CHECKOUT_URL is needed, define it here or import the correct value.
-const STRIPE_CHECKOUT_URL = "https://your-stripe-checkout-url.com"; // Replace with your actual Stripe Checkout URL
+import { config } from "@/lib/config";
 
 // Small helper to handle SEO for the landing page
 function updateSeo(title: string, description: string, canonicalHref?: string) {
@@ -94,7 +93,7 @@ const Index = () => {
         period: "/month",
         highlight: index === 0, // Make first product (Pro) highlighted
         features: getFeaturesByPlan(product.name),
-        cta: () => window.open(STRIPE_CHECKOUT_URL, "_blank"),
+        cta: () => window.open(config.stripe.checkoutUrl, "_blank"),
         ctaLabel: `Get ${product.name}`,
       })),
     ],
