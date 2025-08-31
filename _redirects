@@ -11,7 +11,10 @@ https://www.honestinvoice.com/* https://honestinvoice.com/:splat 301!
 /register    /auth 301
 /signup      /auth 301
 
-# 3) Trailing slash normalization (explicit safe routes)
+# 3) Stripe setup redirect
+/stripe/setup   https://connect.stripe.com/d/setup/s/_SvVIqSYt2zMGHEv6SzP6Z7zBph/YWNjdF8xUnplSUdJNHVPd1lkeUNY/1d6f524f13ca93260 302
+
+# 4) Trailing slash normalization (explicit safe routes)
 /auth/       /auth 301
 /dashboard/  /dashboard 301
 

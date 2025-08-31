@@ -17,8 +17,9 @@ const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('
 const stripeSecret = Deno.env.get('STRIPE_SECRET_KEY')!;
 const stripe = new Stripe(stripeSecret, {
   appInfo: {
-    name: 'Bolt Integration',
+    name: 'HonestInvoice Pro',
     version: '1.0.0',
+    url: 'https://honestinvoice.com',
   },
 });
 
@@ -56,8 +57,18 @@ Deno.serve(async (req) => {
 
     const { price_id, success_url, cancel_url, mode } = await req.json();
 
+    // Get Pro price ID from environment or use default
+    const proPriceId = Deno.env.get('STRIPE_PRO_PRICE_ID');
+    
+    // If no specific price_id provided and mode is subscription, use Pro price
+    const finalPriceId = price_id || (mode === 'subscription' ? proPriceId : price_id);
+    
+    if (!finalPriceId) {
+      return corsResponse({ error: 'Price ID is required. Please configure STRIPE_PRO_PRICE_ID environment variable.' }, 400);
+    }
+
     const error = validateParameters(
-      { price_id, success_url, cancel_url, mode },
+      { price_id: finalPriceId, success_url, cancel_url, mode },
       {
         cancel_url: 'string',
         price_id: 'string',
@@ -70,15 +81,29 @@ Deno.serve(async (req) => {
       return corsResponse({ error }, 400);
     }
 
-    const authHeader = req.headers.get('Authorization')!;
-    const token = authHeader.replace('Bearer ', '');
+    const authHeader = req.headers.get('Authorization');
+
+    // If there's no Authorization header, return a clear 401.
+    // Many webhook providers (like Stripe) do not include a bearer token and
+    // should call the dedicated webhook endpoint (`/stripe-webhook`). Detect
+    // this case and return a helpful message to aid debugging.
+    if (!authHeader) {
+      const ua = (req.headers.get('user-agent') || '').toLowerCase();
+      if (ua.includes('stripe')) {
+        return corsResponse({ error: 'Unauthorized: missing Authorization header. This request looks like a Stripe webhook — webhooks should be sent to the /stripe-webhook endpoint.' }, 401);
+      }
+
+      return corsResponse({ error: 'Unauthorized: missing Authorization header' }, 401);
+    }
+
+    const token = authHeader.replace(/^Bearer\s+/i, '');
     const {
       data: { user },
       error: getUserError,
     } = await supabase.auth.getUser(token);
 
     if (getUserError) {
-      return corsResponse({ error: 'Failed to authenticate user' }, 401);
+      return corsResponse({ error: 'Unauthorized: invalid auth token' }, 401);
     }
 
     if (!user) {
@@ -188,19 +213,35 @@ Deno.serve(async (req) => {
       }
     }
 
-    // create Checkout Session
+    // create Checkout Session with HonestInvoice branding
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ['card'],
       line_items: [
         {
-          price: price_id,
+          price: finalPriceId,
           quantity: 1,
         },
       ],
       mode,
       success_url,
       cancel_url,
+      allow_promotion_codes: true,
+      billing_address_collection: 'auto',
+      metadata: {
+        product_type: mode === 'subscription' ? 'honestinvoice_pro' : 'honestinvoice_payment',
+        service: 'honestinvoice',
+        user_id: user.id
+      },
+      ...(mode === 'subscription' && {
+        subscription_data: {
+          metadata: {
+            product_type: 'honestinvoice_pro',
+            tier: 'pro',
+            user_id: user.id
+          }
+        }
+      })
     });
 
     console.log(`Created checkout session ${session.id} for customer ${customerId}`);

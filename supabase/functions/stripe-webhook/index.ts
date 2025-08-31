@@ -13,11 +13,13 @@ import Stripe from 'npm:stripe@17.7.0';
 import { createClient } from 'npm:@supabase/supabase-js@2.49.1';
 
 const stripeSecret = Deno.env.get('STRIPE_SECRET_KEY')!;
-const stripeWebhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')!;
+// Read webhook secret optionally so we can return a clear server error when it's missing
+const stripeWebhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
 const stripe = new Stripe(stripeSecret, {
   appInfo: {
-    name: 'Bolt Integration',
+    name: 'HonestInvoice Pro',
     version: '1.0.0',
+    url: 'https://honestinvoice.com',
   },
 });
 
@@ -34,11 +36,18 @@ Deno.serve(async (req) => {
       return new Response('Method not allowed', { status: 405 });
     }
 
+    // Ensure webhook signing secret is present in the environment
+    if (!stripeWebhookSecret) {
+      console.error('Missing STRIPE_WEBHOOK_SECRET environment variable for stripe-webhook function');
+      return new Response('Server misconfigured: missing STRIPE_WEBHOOK_SECRET', { status: 500 });
+    }
+
     // get the signature from the header
     const signature = req.headers.get('stripe-signature');
 
     if (!signature) {
-      return new Response('No signature found', { status: 400 });
+      console.warn('No stripe-signature header found. Headers:', Object.fromEntries(req.headers.entries()));
+      return new Response(JSON.stringify({ error: 'No stripe-signature header found' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
     // get the raw body
@@ -54,10 +63,15 @@ Deno.serve(async (req) => {
       return new Response(`Webhook signature verification failed: ${error.message}`, { status: 400 });
     }
 
-    // Process the event asynchronously but don't wait for completion
-    // This allows Stripe to receive a quick 200 response
-    // Note: In Supabase Edge Functions, we handle the event synchronously to ensure proper error handling
-    await handleEvent(event);
+    // Process the event asynchronously but don't wait for completion here
+    // We'll handle it synchronously to capture errors, but always return 200 when verification succeeds
+    try {
+      await handleEvent(event);
+    } catch (err) {
+      console.error('Error while handling Stripe event:', err);
+      // Still return 200 to Stripe (to avoid retries) but log the error for investigation
+      return Response.json({ received: true, warning: 'Processing error logged' });
+    }
 
     return Response.json({ received: true });
   } catch (error: any) {
