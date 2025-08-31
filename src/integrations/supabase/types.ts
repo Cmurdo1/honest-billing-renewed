@@ -340,7 +340,6 @@ export type Database = {
           invoice_footer?: string | null
           created_at?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
