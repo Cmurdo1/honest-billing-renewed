@@ -8,10 +8,16 @@ export interface StripeProduct {
   currency: string;
 }
 
+const proPriceId = import.meta.env.VITE_STRIPE_PRO_PRICE_ID;
+
+if (!proPriceId) {
+  throw new Error("VITE_STRIPE_PRO_PRICE_ID must be set in the environment.");
+}
+
 export const stripeProducts: StripeProduct[] = [
   {
     id: 'pro_tier',
-    priceId: 'pro_tier',
+    priceId: proPriceId,
     name: 'Pro',
     description: 'Pro membership with advanced features',
     mode: 'subscription',
