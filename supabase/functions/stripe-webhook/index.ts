@@ -178,25 +178,31 @@ async function syncCustomerFromStripe(customerId: string) {
     }
 
     // Also update the new subscriptions table
-    const { error: newSubError } = await supabase.from('subscriptions').upsert(
-      {
-        user_id: (await supabase.from('profiles').select('id').eq('id', customerId).single()).data?.id,
-        stripe_customer_id: customerId,
-        stripe_subscription_id: subscription.id,
-        status: subscription.status,
-        plan_name: subscription.status === 'active' ? 'Pro' : null,
-        price_id: subscription.items.data[0].price.id,
-        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-        cancel_at_period_end: subscription.cancel_at_period_end,
-      },
-      {
-        onConflict: 'user_id',
-      },
-    );
+    const userId = await supabase.rpc('get_user_id_from_stripe_customer', { 
+      stripe_customer_id: customerId 
+    });
 
-    if (newSubError) {
-      console.error('Error syncing to subscriptions table:', newSubError);
+    if (userId.data) {
+      const { error: newSubError } = await supabase.from('subscriptions').upsert(
+        {
+          user_id: userId.data,
+          stripe_customer_id: customerId,
+          stripe_subscription_id: subscription.id,
+          status: subscription.status,
+          plan_name: subscription.status === 'active' ? 'Pro' : null,
+          price_id: subscription.items.data[0].price.id,
+          current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          cancel_at_period_end: subscription.cancel_at_period_end,
+        },
+        {
+          onConflict: 'user_id',
+        },
+      );
+
+      if (newSubError) {
+        console.error('Error syncing to subscriptions table:', newSubError);
+      }
     }
     
     console.info(`Successfully synced subscription for customer: ${customerId}`);
