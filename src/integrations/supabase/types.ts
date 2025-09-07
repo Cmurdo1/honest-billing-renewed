@@ -264,12 +264,12 @@ export type Database = {
           last_generated_date: string | null
           next_due_date: string
           notes: string | null
-          "s.customer_id": string
           subtotal: number
           tax: number
           template_number: string
           total: number
           updated_at: string
+          user_id: string
         }
         Insert: {
           client_id: string
@@ -280,12 +280,12 @@ export type Database = {
           last_generated_date?: string | null
           next_due_date: string
           notes?: string | null
-          "s.customer_id": string
           subtotal?: number
           tax?: number
           template_number: string
           total?: number
           updated_at?: string
+          user_id: string
         }
         Update: {
           client_id?: string
@@ -296,12 +296,12 @@ export type Database = {
           last_generated_date?: string | null
           next_due_date?: string
           notes?: string | null
-          "s.customer_id"?: string
           subtotal?: number
           tax?: number
           template_number?: string
           total?: number
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -312,70 +312,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      s: {
-        Row: {
-          client_id: string | null
-          created_at: string | null
-          customer_id: string | null
-          id: string
-          stripe_customer_id: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          client_id?: string | null
-          created_at?: string | null
-          customer_id?: string | null
-          id?: string
-          stripe_customer_id?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          client_id?: string | null
-          created_at?: string | null
-          customer_id?: string | null
-          id?: string
-          stripe_customer_id?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "s_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "stripe_customers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "s_stripe_customer_id_fkey"
-            columns: ["stripe_customer_id"]
-            isOneToOne: false
-            referencedRelation: "stripe_customers"
-            referencedColumns: ["stripe_customer_id"]
-          },
-        ]
-      }
-      "s.customer_id": {
-        Row: {
-          created_at: string
-          id: number
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-        }
-        Update: {
-          created_at?: string
-          id?: number
-        }
-        Relationships: []
       }
       stripe_connect_accounts: {
         Row: {
