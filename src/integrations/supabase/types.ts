@@ -23,6 +23,7 @@ export type Database = {
           id: string
           name: string
           notes: string | null
+          "s.customer_id": number
           stripe_customer_id: string | null
           updated_at: string
           user_id: string
@@ -35,6 +36,7 @@ export type Database = {
           id?: string
           name: string
           notes?: string | null
+          "s.customer_id"?: number
           stripe_customer_id?: string | null
           updated_at?: string
           user_id: string
@@ -47,6 +49,7 @@ export type Database = {
           id?: string
           name?: string
           notes?: string | null
+          "s.customer_id"?: number
           stripe_customer_id?: string | null
           updated_at?: string
           user_id?: string
@@ -349,18 +352,21 @@ export type Database = {
           email: string | null
           id: string
           stripe_customer_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           email?: string | null
           id?: string
           stripe_customer_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           email?: string | null
           id?: string
           stripe_customer_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -419,7 +425,7 @@ export type Database = {
           id: string
           price_id: string | null
           product_id: string | null
-          status: string
+          status: Database["public"]["Enums"]["stripe_subscription_status"]
           stripe_customer_id: string
           stripe_subscription_id: string
           updated_at: string
@@ -433,7 +439,7 @@ export type Database = {
           id?: string
           price_id?: string | null
           product_id?: string | null
-          status: string
+          status?: Database["public"]["Enums"]["stripe_subscription_status"]
           stripe_customer_id: string
           stripe_subscription_id: string
           updated_at?: string
@@ -447,7 +453,7 @@ export type Database = {
           id?: string
           price_id?: string | null
           product_id?: string | null
-          status?: string
+          status?: Database["public"]["Enums"]["stripe_subscription_status"]
           stripe_customer_id?: string
           stripe_subscription_id?: string
           updated_at?: string
@@ -710,6 +716,7 @@ export type Database = {
           email: string | null
           id: string
           stripe_customer_id: string
+          user_id: string | null
         }
       }
       save_stripe_subscription: {
@@ -733,7 +740,7 @@ export type Database = {
           id: string
           price_id: string | null
           product_id: string | null
-          status: string
+          status: Database["public"]["Enums"]["stripe_subscription_status"]
           stripe_customer_id: string
           stripe_subscription_id: string
           updated_at: string
@@ -747,6 +754,16 @@ export type Database = {
     Enums: {
       invoice_status: "draft" | "sent" | "paid" | "overdue" | "void"
       recurring_frequency: "weekly" | "monthly" | "quarterly" | "annually"
+      stripe_subscription_status:
+        | "not_started"
+        | "incomplete"
+        | "incomplete_expired"
+        | "trialing"
+        | "active"
+        | "past_due"
+        | "canceled"
+        | "unpaid"
+        | "paused"
       user_plan_tier: "free" | "pro" | "enterprise"
     }
     CompositeTypes: {
@@ -877,6 +894,17 @@ export const Constants = {
     Enums: {
       invoice_status: ["draft", "sent", "paid", "overdue", "void"],
       recurring_frequency: ["weekly", "monthly", "quarterly", "annually"],
+      stripe_subscription_status: [
+        "not_started",
+        "incomplete",
+        "incomplete_expired",
+        "trialing",
+        "active",
+        "past_due",
+        "canceled",
+        "unpaid",
+        "paused",
+      ],
       user_plan_tier: ["free", "pro", "enterprise"],
     },
   },
