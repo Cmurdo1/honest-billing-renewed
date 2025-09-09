@@ -8,7 +8,9 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "wrangler pages deploy dist --project-name honestinvoice",
+    "deploy:preview": "wrangler pages deploy dist --project-name honestinvoice --compatibility-date 2024-08-15"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
