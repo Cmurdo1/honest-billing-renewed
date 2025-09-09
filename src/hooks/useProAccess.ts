@@ -24,8 +24,8 @@ export const useProAccess = () => {
       return data;
     },
     enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes - keep data fresh for 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache for 10 minutes
+    staleTime: 30 * 60 * 1000, // 30 minutes - keep data fresh for 30 minutes
+    gcTime: 60 * 60 * 1000, // 60 minutes - keep in cache for 60 minutes
     refetchOnMount: false, // Don't refetch when component mounts
     refetchOnWindowFocus: false, // Don't refetch when window gains focus
     refetchOnReconnect: false, // Don't refetch when reconnecting
