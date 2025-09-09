@@ -11,7 +11,7 @@ export const useProAccess = () => {
       if (!user?.id) return null;
       
       const { data, error } = await supabase
-        .from('subscriptions')
+        .from('stripe_user_subscriptions')
         .select('*')
         .eq('user_id', user.id)
         .single();
@@ -31,7 +31,7 @@ export const useProAccess = () => {
     refetchOnReconnect: false, // Don't refetch when reconnecting
   });
   
-  const isPro = subscription?.status === 'active' && subscription?.plan_name === 'Pro';
+  const isPro = subscription?.status === 'active';
   
   return {
     isPro,
