@@ -197,7 +197,6 @@ const RecurringInvoices = () => {
         <div className="flex items-center gap-2">
           <RefreshCw className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-bold text-primary">Recurring Invoices</h2>
-          <Badge variant="secondary" className="ml-2">Pro Feature</Badge>
         </div>
 
         {/* Create Recurring Invoice */}

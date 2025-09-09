@@ -43,25 +43,14 @@ const SubscriptionStatus = () => {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <Badge 
-        variant={isActive ? 'default' : 'secondary'} 
-        className="flex items-center gap-1"
-      >
-        {getIcon()}
-        {product.name}
-        {!isActive && ` (${subscription.status})`}
-      </Badge>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => refreshSubscription.mutate()}
-        disabled={refreshSubscription.isPending}
-        className="h-6 w-6 p-0"
-      >
-        <RefreshCw className={`h-3 w-3 ${refreshSubscription.isPending ? 'animate-spin' : ''}`} />
-      </Button>
-    </div>
+    <Badge 
+      variant={isActive ? 'default' : 'secondary'} 
+      className="flex items-center gap-1"
+    >
+      {getIcon()}
+      {product.name}
+      {!isActive && ` (${subscription.status})`}
+    </Badge>
   );
 };
 

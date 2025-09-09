@@ -81,7 +81,6 @@ const Analytics = () => {
         <div className="flex items-center gap-2">
           <TrendingUp className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-bold">Business Analytics</h2>
-          <Badge variant="secondary" className="ml-2">Pro Feature</Badge>
         </div>
 
         {analyticsData.isLoading ? (

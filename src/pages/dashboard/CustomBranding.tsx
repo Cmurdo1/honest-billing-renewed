@@ -44,7 +44,6 @@ const CustomBranding = () => {
         <div className="flex items-center gap-2">
           <Palette className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-bold">Custom Branding</h2>
-          <Badge variant="secondary" className="ml-2">Pro Feature</Badge>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
