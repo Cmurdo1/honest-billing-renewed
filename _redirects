@@ -1,8 +1,2 @@
 # Cloudflare Pages redirects for SPA routing
-const { data, error } = await supabase.auth.signUp({
-  email: 'example@email.com',
-  password: 'example-password',
-  options: {
-    emailRedirectTo: 'https://honestinvoice.com/signin'
-  }
-})
+/*    /index.html   200

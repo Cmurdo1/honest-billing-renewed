@@ -54,14 +54,14 @@ const Dashboard = () => {
 
       <main>
         <Tabs defaultValue={defaultTab} className="container mx-auto px-4 py-8">
-          <TabsList className="mb-8 grid grid-cols-7 w-full max-w-4xl mx-auto gap-1">
-            <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-            <TabsTrigger value="clients" className="text-xs sm:text-sm">Clients</TabsTrigger>
-            <TabsTrigger value="invoices" className="text-xs sm:text-sm">Invoices</TabsTrigger>
-            <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
-            <TabsTrigger value="branding" className="text-xs sm:text-sm">Branding</TabsTrigger>
-            <TabsTrigger value="recurring" className="text-xs sm:text-sm">Recurring</TabsTrigger>
-            <TabsTrigger value="settings" className="text-xs sm:text-sm">Settings</TabsTrigger>
+          <TabsList className="mb-8 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 w-full max-w-6xl mx-auto gap-1">
+            <TabsTrigger value="overview" className="text-xs px-2 py-1.5">Overview</TabsTrigger>
+            <TabsTrigger value="clients" className="text-xs px-2 py-1.5">Clients</TabsTrigger>
+            <TabsTrigger value="invoices" className="text-xs px-2 py-1.5">Invoices</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs px-2 py-1.5">Analytics</TabsTrigger>
+            <TabsTrigger value="branding" className="text-xs px-2 py-1.5">Branding</TabsTrigger>
+            <TabsTrigger value="recurring" className="text-xs px-2 py-1.5">Recurring</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs px-2 py-1.5">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
