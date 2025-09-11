@@ -45,11 +45,11 @@ const Overview = () => {
       {!proLoading && (
         <Card className={`border-2 ${isPro ? 'border-primary bg-primary/5' : 'border-accent bg-accent/10'}`}>
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
                 {isPro ? (
                   <>
-                    <Crown className="h-6 w-6 text-primary" />
+                    <Crown className="h-6 w-6 text-primary flex-shrink-0" />
                     <div>
                       <h3 className="font-semibold text-primary">Pro Account Active</h3>
                       <p className="text-sm text-muted-foreground">
@@ -59,7 +59,7 @@ const Overview = () => {
                   </>
                 ) : (
                   <>
-                    <Crown className="h-6 w-6 text-accent" />
+                    <Crown className="h-6 w-6 text-accent flex-shrink-0" />
                     <div>
                       <h3 className="font-semibold text-accent">
                         Upgrade to Pro
@@ -74,7 +74,7 @@ const Overview = () => {
               {!isPro && (
                 <Button 
                   onClick={() => window.open("https://buy.stripe.com/aFaeVd2ub23leHdf3p7kc03", "_blank")}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 w-full sm:w-auto justify-center"
                 >
                   Upgrade Now
                   <ArrowRight className="h-4 w-4" />
@@ -155,10 +155,11 @@ const Overview = () => {
               <Button 
                 onClick={() => window.open("https://buy.stripe.com/aFaeVd2ub23leHdf3p7kc03", "_blank")}
                 size="lg"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 w-full sm:w-auto justify-center"
               >
                 <Crown className="h-4 w-4" />
-                Upgrade to Pro - $4.99/month
+                <span className="hidden sm:inline">Upgrade to Pro - $4.99/month</span>
+                <span className="sm:hidden">Upgrade to Pro</span>
               </Button>
             </div>
           </CardContent>

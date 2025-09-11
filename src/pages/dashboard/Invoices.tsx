@@ -198,79 +198,93 @@ const Invoices = () => {
           <CardTitle>Invoices</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>#</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Issued</TableHead>
-                <TableHead>Due</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {invoices.isLoading ? (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={7}>Loading…</TableCell>
+                  <TableHead className="min-w-[80px]">#</TableHead>
+                  <TableHead className="min-w-[120px]">Client</TableHead>
+                  <TableHead className="min-w-[80px]">Status</TableHead>
+                  <TableHead className="min-w-[80px]">Total</TableHead>
+                  <TableHead className="min-w-[100px]">Issued</TableHead>
+                  <TableHead className="min-w-[100px]">Due</TableHead>
+                  <TableHead className="min-w-[200px]">Actions</TableHead>
                 </TableRow>
-              ) : invoices.data && invoices.data.length > 0 ? (
-                invoices.data.map((inv: any) => (
-                  <TableRow key={inv.id}>
-                    <TableCell>{inv.number}</TableCell>
-                    <TableCell>{inv.client?.name ?? "—"}</TableCell>
-                    <TableCell className="capitalize">{inv.status}</TableCell>
-                    <TableCell>${Number(inv.total).toFixed(2)}</TableCell>
-                    <TableCell>{inv.issue_date}</TableCell>
-                    <TableCell>{inv.due_date || "—"}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2 flex-wrap">
-                        <Button size="sm" variant="outline">Edit</Button>
-                        {isPro ? (
-                          <>
+              </TableHeader>
+              <TableBody>
+                {invoices.isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={7}>Loading…</TableCell>
+                  </TableRow>
+                ) : invoices.data && invoices.data.length > 0 ? (
+                  invoices.data.map((inv: any) => (
+                    <TableRow key={inv.id}>
+                      <TableCell className="font-medium text-sm">{inv.number}</TableCell>
+                      <TableCell className="text-sm">{inv.client?.name ?? "—"}</TableCell>
+                      <TableCell className="capitalize text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          inv.status === 'paid' ? 'bg-green-100 text-green-700' :
+                          inv.status === 'sent' ? 'bg-blue-100 text-blue-700' :
+                          inv.status === 'overdue' ? 'bg-red-100 text-red-700' :
+                          'bg-gray-100 text-gray-700'
+                        }`}>
+                          {inv.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="font-medium text-sm">${Number(inv.total).toFixed(2)}</TableCell>
+                      <TableCell className="text-sm">{inv.issue_date}</TableCell>
+                      <TableCell className="text-sm">{inv.due_date || "—"}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-1 flex-wrap">
+                          <Button size="sm" variant="outline" className="text-xs px-2">Edit</Button>
+                          {isPro ? (
+                            <>
+                              <Button 
+                                size="sm" 
+                                variant="secondary" 
+                                className="flex items-center gap-1 text-xs px-2"
+                                onClick={() => downloadPDF(inv.id, inv.number)}
+                              >
+                                <Download className="h-3 w-3" />
+                                <span className="hidden sm:inline">PDF</span>
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="default" 
+                                className="flex items-center gap-1 text-xs px-2"
+                                onClick={() => sendInvoice(inv.id, inv.number)}
+                              >
+                                <Send className="h-3 w-3" />
+                                <span className="hidden sm:inline">Send</span>
+                              </Button>
+                            </>
+                          ) : (
                             <Button 
                               size="sm" 
                               variant="secondary" 
-                              className="flex items-center gap-1"
-                              onClick={() => downloadPDF(inv.id, inv.number)}
+                              onClick={() => window.open("https://buy.stripe.com/aFaeVd2ub23leHdf3p7kc03", "_blank")}
+                              className="text-xs flex items-center gap-1 px-2"
                             >
-                              <Download className="h-3 w-3" />
-                              PDF
+                              <Crown className="h-3 w-3" />
+                              <span className="hidden sm:inline">Pro</span>
                             </Button>
-                            <Button 
-                              size="sm" 
-                              variant="default" 
-                              className="flex items-center gap-1"
-                              onClick={() => sendInvoice(inv.id, inv.number)}
-                            >
-                              <Send className="h-3 w-3" />
-                              Send
-                            </Button>
-                          </>
-                        ) : (
-                          <Button 
-                            size="sm" 
-                            variant="secondary" 
-                            onClick={() => window.open("https://buy.stripe.com/aFaeVd2ub23leHdf3p7kc03", "_blank")}
-                            className="text-xs flex items-center gap-1"
-                          >
-                            <Crown className="h-3 w-3" />
-                            Pro: Export
+                          )}
+                          <Button size="sm" variant="destructive" className="text-xs px-2">
+                            <span className="hidden sm:inline">Delete</span>
+                            <span className="sm:hidden">×</span>
                           </Button>
-                        )}
-                        <Button size="sm" variant="destructive">Delete</Button>
-                      </div>
-                    </TableCell>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No invoices yet</TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7}>No invoices yet</TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </section>

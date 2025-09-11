@@ -100,36 +100,38 @@ const Clients = () => {
           <CardTitle>Clients</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead>Created</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clients.isLoading ? (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={4}>Loading…</TableCell>
+                  <TableHead className="min-w-[120px]">Name</TableHead>
+                  <TableHead className="min-w-[160px]">Email</TableHead>
+                  <TableHead className="min-w-[120px]">Company</TableHead>
+                  <TableHead className="min-w-[100px]">Created</TableHead>
                 </TableRow>
-              ) : clients.data && clients.data.length > 0 ? (
-                clients.data.map((c: any) => (
-                  <TableRow key={c.id}>
-                    <TableCell>{c.name}</TableCell>
-                    <TableCell>{c.email || "—"}</TableCell>
-                    <TableCell>{c.company || "—"}</TableCell>
-                    <TableCell>{new Date(c.created_at).toLocaleDateString()}</TableCell>
+              </TableHeader>
+              <TableBody>
+                {clients.isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={4}>Loading…</TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={4}>No clients yet</TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                ) : clients.data && clients.data.length > 0 ? (
+                  clients.data.map((c: any) => (
+                    <TableRow key={c.id}>
+                      <TableCell className="font-medium">{c.name}</TableCell>
+                      <TableCell className="text-sm">{c.email || "—"}</TableCell>
+                      <TableCell className="text-sm">{c.company || "—"}</TableCell>
+                      <TableCell className="text-sm">{new Date(c.created_at).toLocaleDateString()}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No clients yet</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </section>

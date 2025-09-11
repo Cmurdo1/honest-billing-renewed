@@ -39,30 +39,49 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="px-6 py-4 border-b border-primary/20 flex items-center justify-between bg-gradient-to-r from-background to-primary/5">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">HI</span>
-            <h1 className="text-2xl font-semibold text-primary">Dashboard</h1>
+      <header className="px-4 sm:px-6 py-4 border-b border-primary/20 bg-gradient-to-r from-background to-primary/5">
+        {/* Mobile layout - stacked */}
+        <div className="flex flex-col gap-3 sm:hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-sm">HI</span>
+              <h1 className="text-xl font-semibold text-primary">Dashboard</h1>
+            </div>
+            <Button variant="secondary" size="sm" onClick={signOut}>Sign out</Button>
           </div>
-          <SubscriptionStatus />
+          <div className="flex justify-center">
+            <SubscriptionStatus />
+          </div>
         </div>
-        <div>
-          <Button variant="secondary" onClick={signOut}>Sign out</Button>
+        
+        {/* Desktop layout - single row */}
+        <div className="hidden sm:flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">HI</span>
+              <h1 className="text-2xl font-semibold text-primary">Dashboard</h1>
+            </div>
+            <SubscriptionStatus />
+          </div>
+          <div>
+            <Button variant="secondary" onClick={signOut}>Sign out</Button>
+          </div>
         </div>
       </header>
 
       <main>
-        <Tabs defaultValue={defaultTab} className="container mx-auto px-4 py-8">
-          <TabsList className="mb-8 flex flex-wrap gap-1 w-full max-w-6xl mx-auto h-auto p-1">
-            <TabsTrigger value="overview" className="text-xs px-3 py-2 flex-shrink-0">Overview</TabsTrigger>
-            <TabsTrigger value="clients" className="text-xs px-3 py-2 flex-shrink-0">Clients</TabsTrigger>
-            <TabsTrigger value="invoices" className="text-xs px-3 py-2 flex-shrink-0">Invoices</TabsTrigger>
-            <TabsTrigger value="analytics" className="text-xs px-3 py-2 flex-shrink-0">Analytics</TabsTrigger>
-            <TabsTrigger value="branding" className="text-xs px-3 py-2 flex-shrink-0">Branding</TabsTrigger>
-            <TabsTrigger value="recurring" className="text-xs px-3 py-2 flex-shrink-0">Recurring</TabsTrigger>
-            <TabsTrigger value="settings" className="text-xs px-3 py-2 flex-shrink-0">Settings</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue={defaultTab} className="container mx-auto px-4 py-4 sm:py-8">
+          <div className="mb-6 sm:mb-8">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:flex lg:w-auto lg:justify-center gap-1 h-auto p-1">
+              <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Overview</TabsTrigger>
+              <TabsTrigger value="clients" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Clients</TabsTrigger>
+              <TabsTrigger value="invoices" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Invoices</TabsTrigger>
+              <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Analytics</TabsTrigger>
+              <TabsTrigger value="branding" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Branding</TabsTrigger>
+              <TabsTrigger value="recurring" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Recurring</TabsTrigger>
+              <TabsTrigger value="settings" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Settings</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview">
             <Overview />
