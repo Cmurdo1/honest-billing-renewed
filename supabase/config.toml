@@ -1,1 +1,23 @@
 project_id = "ezdmasftbvaohoghiflo"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[functions.refresh-subscription]
+verify_jwt = false
+
+[functions.stripe-checkout]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.generate-invoice-pdf]
+verify_jwt = true
+
+[functions.send-invoice-email]
+verify_jwt = true

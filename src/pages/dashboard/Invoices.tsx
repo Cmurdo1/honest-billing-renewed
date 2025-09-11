@@ -87,6 +87,47 @@ const Invoices = () => {
     onError: (e: any) => toast.error(e.message || "Failed to create invoice"),
   });
 
+  const downloadPDF = async (invoiceId: string, invoiceNumber: string) => {
+    try {
+      const response = await supabase.functions.invoke('generate-invoice-pdf', {
+        body: { invoiceId }
+      });
+      
+      if (response.error) throw response.error;
+      
+      // Create blob and download
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `invoice-${invoiceNumber}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      toast.success("PDF downloaded successfully");
+    } catch (error: any) {
+      console.error('PDF generation error:', error);
+      toast.error("Failed to generate PDF");
+    }
+  };
+
+  const sendInvoice = async (invoiceId: string, invoiceNumber: string) => {
+    try {
+      const response = await supabase.functions.invoke('send-invoice-email', {
+        body: { invoiceId }
+      });
+      
+      if (response.error) throw response.error;
+      
+      toast.success(`Invoice ${invoiceNumber} sent successfully`);
+    } catch (error: any) {
+      console.error('Email sending error:', error);
+      toast.error("Failed to send invoice");
+    }
+  };
+
   return (
     <section className="space-y-6">
       <Card>
@@ -188,11 +229,21 @@ const Invoices = () => {
                         <Button size="sm" variant="outline">Edit</Button>
                         {isPro ? (
                           <>
-                            <Button size="sm" variant="secondary" className="flex items-center gap-1">
+                            <Button 
+                              size="sm" 
+                              variant="secondary" 
+                              className="flex items-center gap-1"
+                              onClick={() => downloadPDF(inv.id, inv.number)}
+                            >
                               <Download className="h-3 w-3" />
                               PDF
                             </Button>
-                            <Button size="sm" variant="default" className="flex items-center gap-1">
+                            <Button 
+                              size="sm" 
+                              variant="default" 
+                              className="flex items-center gap-1"
+                              onClick={() => sendInvoice(inv.id, inv.number)}
+                            >
                               <Send className="h-3 w-3" />
                               Send
                             </Button>
