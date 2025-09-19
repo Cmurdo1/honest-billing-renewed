@@ -89,8 +89,13 @@ const Invoices = () => {
 
   const downloadPDF = async (invoiceId: string, invoiceNumber: string) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const response = await supabase.functions.invoke('generate-invoice-pdf', {
-        body: { invoiceId }
+        body: { invoiceId },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
       });
       
       if (response.error) throw response.error;
@@ -109,14 +114,19 @@ const Invoices = () => {
       toast.success("PDF downloaded successfully");
     } catch (error: any) {
       console.error('PDF generation error:', error);
-      toast.error("Failed to generate PDF");
+      toast.error("Failed to generate PDF: " + (error.message || 'Unknown error'));
     }
   };
 
   const sendInvoice = async (invoiceId: string, invoiceNumber: string) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const response = await supabase.functions.invoke('send-invoice-email', {
-        body: { invoiceId }
+        body: { invoiceId },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
       });
       
       if (response.error) throw response.error;
@@ -124,7 +134,7 @@ const Invoices = () => {
       toast.success(`Invoice ${invoiceNumber} sent successfully`);
     } catch (error: any) {
       console.error('Email sending error:', error);
-      toast.error("Failed to send invoice");
+      toast.error("Failed to send invoice: " + (error.message || 'Unknown error'));
     }
   };
 
