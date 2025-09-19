@@ -21,18 +21,25 @@ serve(async (req) => {
     );
 
     // Get invoice with client details
-    const { data: invoice, error } = await supabase
+    const { data: invoice, error: invoiceError } = await supabase
       .from('invoices')
-      .select(`
-        *,
-        client:clients(name, email, company, address),
-        user_settings(display_name, company_name, address)
-      `)
+      .select('*, client:clients(name, email, company, address)')
       .eq('id', invoiceId)
       .single();
 
-    if (error || !invoice) {
+    if (invoiceError || !invoice) {
       throw new Error('Invoice not found');
+    }
+
+    // Get user settings
+    const { data: userSettings, error: settingsError } = await supabase
+      .from('user_settings')
+      .select('display_name, company_name, address')
+      .eq('user_id', invoice.user_id)
+      .single();
+
+    if (settingsError) {
+      console.error('Could not fetch user settings:', settingsError.message);
     }
 
     // Generate HTML for PDF
@@ -63,9 +70,9 @@ serve(async (req) => {
         <div class="invoice-details">
           <div class="company-info">
             <h3>From:</h3>
-            <p><strong>${invoice.user_settings?.[0]?.display_name || 'Your Business'}</strong></p>
-            <p>${invoice.user_settings?.[0]?.company_name || ''}</p>
-            <p>${invoice.user_settings?.[0]?.address || ''}</p>
+            <p><strong>${userSettings?.display_name || 'Your Business'}</strong></p>
+            <p>${userSettings?.company_name || ''}</p>
+            <p>${userSettings?.address || ''}</p>
           </div>
           
           <div class="client-info">

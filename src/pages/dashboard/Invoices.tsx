@@ -89,14 +89,14 @@ const Invoices = () => {
 
   const downloadPDF = async (invoiceId: string, invoiceNumber: string) => {
     try {
-      const response = await supabase.functions.invoke('generate-invoice-pdf', {
+      const { data, error } = await supabase.functions.invoke('generate-invoice-pdf', {
         body: { invoiceId }
       });
       
-      if (response.error) throw response.error;
+      if (error) throw error;
       
       // Create blob and download
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = data;
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

@@ -24,25 +24,32 @@ serve(async (req) => {
     );
 
     // Get invoice with client details
-    const { data: invoice, error } = await supabase
+    const { data: invoice, error: invoiceError } = await supabase
       .from('invoices')
-      .select(`
-        *,
-        client:clients(name, email, company),
-        user_settings(display_name, company_name)
-      `)
+      .select('*, client:clients(name, email, company)')
       .eq('id', invoiceId)
       .single();
 
-    if (error || !invoice) {
+    if (invoiceError || !invoice) {
       throw new Error('Invoice not found');
+    }
+
+    // Get user settings
+    const { data: userSettings, error: settingsError } = await supabase
+      .from('user_settings')
+      .select('display_name, company_name')
+      .eq('user_id', invoice.user_id)
+      .single();
+
+    if (settingsError) {
+      console.error('Could not fetch user settings:', settingsError.message);
     }
 
     if (!invoice.client?.email) {
       throw new Error('Client email not found');
     }
 
-    const companyName = invoice.user_settings?.[0]?.company_name || invoice.user_settings?.[0]?.display_name || 'Your Business';
+    const companyName = userSettings?.company_name || userSettings?.display_name || 'Your Business';
 
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -81,7 +88,7 @@ serve(async (req) => {
     `;
 
     const emailResponse = await resend.emails.send({
-      from: 'invoices@resend.dev', // You'll need to configure this with your verified domain
+      from: 'noreply@yourdomain.com', // TODO: Replace with your verified Resend domain
       to: [invoice.client.email],
       subject: `Invoice ${invoice.number} from ${companyName}`,
       html: emailHtml,
