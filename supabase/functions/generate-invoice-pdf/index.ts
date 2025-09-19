@@ -25,15 +25,28 @@ serve(async (req) => {
       .from('invoices')
       .select(`
         *,
-        client:clients(name, email, company, address),
-        user_settings!invoices_user_id_fkey(display_name, company_name, address)
+        client:clients(name, email, company, address)
       `)
       .eq('id', invoiceId)
       .single();
 
     if (error || !invoice) {
+      console.error('Invoice query error:', error);
       throw new Error('Invoice not found');
     }
+
+    // Get user settings separately
+    const { data: userSettings } = await supabase
+      .from('user_settings')
+      .select('display_name, company_name, address')
+      .eq('user_id', invoice.user_id)
+      .single();
+
+    const companyName = userSettings?.company_name || userSettings?.display_name || 'Your Business';
+    const companyAddress = userSettings?.address || '';
+    const clientName = invoice.client?.name || 'Client';
+    const clientCompany = invoice.client?.company || '';
+    const clientAddress = invoice.client?.address || '';
 
     // Generate HTML for PDF
     const html = `
@@ -63,16 +76,15 @@ serve(async (req) => {
         <div class="invoice-details">
           <div class="company-info">
             <h3>From:</h3>
-            <p><strong>${invoice.user_settings?.[0]?.display_name || 'Your Business'}</strong></p>
-            <p>${invoice.user_settings?.[0]?.company_name || ''}</p>
-            <p>${invoice.user_settings?.[0]?.address || ''}</p>
+            <p><strong>${companyName}</strong></p>
+            <p>${companyAddress}</p>
           </div>
           
           <div class="client-info">
             <h3>Bill To:</h3>
-            <p><strong>${invoice.client?.name}</strong></p>
-            <p>${invoice.client?.company || ''}</p>
-            <p>${invoice.client?.address || ''}</p>
+            <p><strong>${clientName}</strong></p>
+            <p>${clientCompany}</p>
+            <p>${clientAddress}</p>
             <p>${invoice.client?.email || ''}</p>
           </div>
         </div>

@@ -28,21 +28,28 @@ serve(async (req) => {
       .from('invoices')
       .select(`
         *,
-        client:clients(name, email, company),
-        user_settings!invoices_user_id_fkey(display_name, company_name)
+        client:clients(name, email, company)
       `)
       .eq('id', invoiceId)
       .single();
 
     if (error || !invoice) {
+      console.error('Invoice query error:', error);
       throw new Error('Invoice not found');
     }
+
+    // Get user settings separately
+    const { data: userSettings } = await supabase
+      .from('user_settings')
+      .select('display_name, company_name')
+      .eq('user_id', invoice.user_id)
+      .single();
 
     if (!invoice.client?.email) {
       throw new Error('Client email not found');
     }
 
-    const companyName = invoice.user_settings?.[0]?.company_name || invoice.user_settings?.[0]?.display_name || 'Your Business';
+    const companyName = userSettings?.company_name || userSettings?.display_name || 'Your Business';
 
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
