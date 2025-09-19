@@ -26,7 +26,7 @@ serve(async (req) => {
       .select(`
         *,
         client:clients(name, email, company, address),
-        user_settings(display_name, company_name, address)
+        user_settings!invoices_user_id_fkey(display_name, company_name, address)
       `)
       .eq('id', invoiceId)
       .single();
@@ -124,41 +124,15 @@ serve(async (req) => {
       </html>
     `;
 
-    // Convert HTML to PDF using Puppeteer
-    const response = await fetch('https://api.htmlcsstoimage.com/v1/image', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Basic ' + btoa(Deno.env.get('HTMLCSS_API_KEY') + ':')
-      },
-      body: JSON.stringify({
-        html: html,
-        css: '',
-        width: 800,
-        height: 1050,
-        device_scale_factor: 2,
-        format: 'pdf'
-      })
-    });
+    // Convert HTML to PDF - simplified version returns HTML for now
+    // For production PDF generation, consider using a different approach
+    const htmlContent = html;
 
-    if (!response.ok) {
-      // Fallback: return HTML as downloadable file
-      return new Response(html, {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'text/html',
-          'Content-Disposition': `attachment; filename="invoice-${invoice.number}.html"`
-        }
-      });
-    }
-
-    const pdfData = await response.arrayBuffer();
-
-    return new Response(pdfData, {
+    return new Response(htmlContent, {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="invoice-${invoice.number}.pdf"`
+        'Content-Type': 'text/html',
+        'Content-Disposition': `attachment; filename="invoice-${invoice.number}.html"`
       }
     });
 

@@ -100,21 +100,22 @@ const Invoices = () => {
       
       if (response.error) throw response.error;
       
-      // Create blob and download
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      // Handle HTML content
+      const htmlContent = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+      const blob = new Blob([htmlContent], { type: 'text/html' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `invoice-${invoiceNumber}.pdf`;
+      a.download = `invoice-${invoiceNumber}.html`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
       
-      toast.success("PDF downloaded successfully");
+      toast.success("Invoice downloaded successfully");
     } catch (error: any) {
       console.error('PDF generation error:', error);
-      toast.error("Failed to generate PDF: " + (error.message || 'Unknown error'));
+      toast.error("Failed to generate invoice: " + (error.message || 'Unknown error'));
     }
   };
 
@@ -256,7 +257,7 @@ const Invoices = () => {
                                 onClick={() => downloadPDF(inv.id, inv.number)}
                               >
                                 <Download className="h-3 w-3" />
-                                <span className="hidden sm:inline">PDF</span>
+                                <span className="hidden sm:inline">HTML</span>
                               </Button>
                               <Button 
                                 size="sm" 

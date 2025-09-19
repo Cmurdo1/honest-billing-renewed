@@ -29,7 +29,7 @@ serve(async (req) => {
       .select(`
         *,
         client:clients(name, email, company),
-        user_settings(display_name, company_name)
+        user_settings!invoices_user_id_fkey(display_name, company_name)
       `)
       .eq('id', invoiceId)
       .single();
