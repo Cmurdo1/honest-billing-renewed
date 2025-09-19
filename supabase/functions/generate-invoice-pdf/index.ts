@@ -13,6 +13,7 @@ serve(async (req) => {
 
   try {
     const { invoiceId } = await req.json();
+    console.log('Received invoiceId:', invoiceId);
     
     // Create Supabase client
     const supabase = createClient(
@@ -20,27 +21,54 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get invoice with client details
-    const { data: invoice, error } = await supabase
+    // First, try basic invoice query
+    console.log('Querying invoice...');
+    const { data: invoiceData, error: invoiceError } = await supabase
       .from('invoices')
-      .select(`
-        *,
-        client:clients(name, email, company, address)
-      `)
+      .select('*')
       .eq('id', invoiceId)
       .single();
 
-    if (error || !invoice) {
-      console.error('Invoice query error:', error);
-      throw new Error('Invoice not found');
+    if (invoiceError) {
+      console.error('Invoice query error:', invoiceError);
+      throw new Error(`Invoice query failed: ${invoiceError.message}`);
     }
 
-    // Get user settings separately
-    const { data: userSettings } = await supabase
+    if (!invoiceData) {
+      console.error('No invoice found with ID:', invoiceId);
+      throw new Error('Invoice not found in database');
+    }
+
+    console.log('Invoice found:', invoiceData);
+
+    // Get client details
+    console.log('Querying client...');
+    const { data: clientData, error: clientError } = await supabase
+      .from('clients')
+      .select('name, email, company, address')
+      .eq('id', invoiceData.client_id)
+      .single();
+
+    if (clientError) {
+      console.error('Client query error:', clientError);
+    }
+
+    // Get user settings
+    console.log('Querying user settings...');
+    const { data: userSettings, error: userError } = await supabase
       .from('user_settings')
       .select('display_name, company_name, address')
-      .eq('user_id', invoice.user_id)
+      .eq('user_id', invoiceData.user_id)
       .single();
+
+    if (userError) {
+      console.error('User settings query error:', userError);
+    }
+
+    const invoice = {
+      ...invoiceData,
+      client: clientData
+    };
 
     const companyName = userSettings?.company_name || userSettings?.display_name || 'Your Business';
     const companyAddress = userSettings?.address || '';
