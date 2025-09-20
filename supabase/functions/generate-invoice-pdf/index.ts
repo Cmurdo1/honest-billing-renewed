@@ -20,18 +20,30 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get invoice with client details
+    // 1. Get invoice
     const { data: invoice, error: invoiceError } = await supabase
       .from('invoices')
-      .select('*, client:clients(name, email, company, address)')
+      .select('*')
       .eq('id', invoiceId)
       .single();
 
     if (invoiceError || !invoice) {
-      throw new Error('Invoice not found');
+      throw new Error(`Invoice not found: ${invoiceError?.message}`);
     }
 
-    // Get user settings
+    // 2. Get client details
+    const { data: client, error: clientError } = await supabase
+      .from('clients')
+      .select('name, email, company, address')
+      .eq('id', invoice.client_id)
+      .single();
+
+    if (clientError) {
+      // Not a fatal error, we can proceed without client details
+      console.error('Could not fetch client details:', clientError.message);
+    }
+
+    // 3. Get user settings
     const { data: userSettings, error: settingsError } = await supabase
       .from('user_settings')
       .select('display_name, company_name, address')
@@ -39,6 +51,7 @@ serve(async (req) => {
       .single();
 
     if (settingsError) {
+      // Not a fatal error, proceed with defaults
       console.error('Could not fetch user settings:', settingsError.message);
     }
 
@@ -77,10 +90,10 @@ serve(async (req) => {
           
           <div class="client-info">
             <h3>Bill To:</h3>
-            <p><strong>${invoice.client?.name}</strong></p>
-            <p>${invoice.client?.company || ''}</p>
-            <p>${invoice.client?.address || ''}</p>
-            <p>${invoice.client?.email || ''}</p>
+            <p><strong>${client?.name || 'N/A'}</strong></p>
+            <p>${client?.company || ''}</p>
+            <p>${client?.address || ''}</p>
+            <p>${client?.email || ''}</p>
           </div>
         </div>
         
@@ -131,42 +144,12 @@ serve(async (req) => {
       </html>
     `;
 
-    // Convert HTML to PDF using Puppeteer
-    const response = await fetch('https://api.htmlcsstoimage.com/v1/image', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Basic ' + btoa(Deno.env.get('HTMLCSS_API_KEY') + ':')
-      },
-      body: JSON.stringify({
-        html: html,
-        css: '',
-        width: 800,
-        height: 1050,
-        device_scale_factor: 2,
-        format: 'pdf'
-      })
-    });
-
-    if (!response.ok) {
-      // Fallback: return HTML as downloadable file
-      return new Response(html, {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'text/html',
-          'Content-Disposition': `attachment; filename="invoice-${invoice.number}.html"`
-        }
-      });
-    }
-
-    const pdfData = await response.arrayBuffer();
-
-    return new Response(pdfData, {
+    // Return the HTML to be opened in a new tab
+    return new Response(html, {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="invoice-${invoice.number}.pdf"`
-      }
+        'Content-Type': 'text/html',
+      },
     });
 
   } catch (error) {

@@ -87,26 +87,20 @@ const Invoices = () => {
     onError: (e: any) => toast.error(e.message || "Failed to create invoice"),
   });
 
-  const downloadPDF = async (invoiceId: string, invoiceNumber: string) => {
+  const downloadPDF = async (invoiceId: string) => {
     try {
       const { data, error } = await supabase.functions.invoke('generate-invoice-pdf', {
-        body: { invoiceId }
+        body: { invoiceId },
       });
-      
+
       if (error) throw error;
-      
-      // Create blob and download
-      const blob = data;
+
+      // The function now returns HTML, so we open it in a new tab
+      const blob = new Blob([data], { type: 'text/html' });
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `invoice-${invoiceNumber}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      
-      toast.success("PDF downloaded successfully");
+      window.open(url, '_blank');
+      toast.success("Invoice opened in new tab. Use Print to save as PDF.");
+
     } catch (error: any) {
       console.error('PDF generation error:', error);
       toast.error("Failed to generate PDF");
@@ -243,7 +237,7 @@ const Invoices = () => {
                                 size="sm" 
                                 variant="secondary" 
                                 className="flex items-center gap-1 text-xs px-2"
-                                onClick={() => downloadPDF(inv.id, inv.number)}
+                                onClick={() => downloadPDF(inv.id)}
                               >
                                 <Download className="h-3 w-3" />
                                 <span className="hidden sm:inline">PDF</span>

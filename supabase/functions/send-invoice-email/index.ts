@@ -23,18 +23,29 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get invoice with client details
+    // 1. Get invoice
     const { data: invoice, error: invoiceError } = await supabase
       .from('invoices')
-      .select('*, client:clients(name, email, company)')
+      .select('*')
       .eq('id', invoiceId)
       .single();
 
     if (invoiceError || !invoice) {
-      throw new Error('Invoice not found');
+      throw new Error(`Invoice not found: ${invoiceError?.message}`);
     }
 
-    // Get user settings
+    // 2. Get client details
+    const { data: client, error: clientError } = await supabase
+      .from('clients')
+      .select('name, email, company')
+      .eq('id', invoice.client_id)
+      .single();
+
+    if (clientError || !client) {
+      throw new Error(`Client not found for invoice: ${clientError?.message}`);
+    }
+
+    // 3. Get user settings
     const { data: userSettings, error: settingsError } = await supabase
       .from('user_settings')
       .select('display_name, company_name')
@@ -45,7 +56,7 @@ serve(async (req) => {
       console.error('Could not fetch user settings:', settingsError.message);
     }
 
-    if (!invoice.client?.email) {
+    if (!client.email) {
       throw new Error('Client email not found');
     }
 
@@ -89,7 +100,7 @@ serve(async (req) => {
 
     const emailResponse = await resend.emails.send({
       from: 'noreply@yourdomain.com', // TODO: Replace with your verified Resend domain
-      to: [invoice.client.email],
+      to: [client.email],
       subject: `Invoice ${invoice.number} from ${companyName}`,
       html: emailHtml,
     });
