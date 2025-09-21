@@ -56,6 +56,90 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_users: {
+        Row: {
+          client_id: string
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean
+          last_login: string | null
+          password_hash: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean
+          last_login?: string | null
+          password_hash?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean
+          last_login?: string | null
+          password_hash?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string | null
+          client_id: string | null
+          created_at: string
+          date: string
+          description: string
+          id: string
+          invoice_id: string | null
+          is_billable: boolean
+          is_invoiced: boolean
+          receipt_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          client_id?: string | null
+          created_at?: string
+          date?: string
+          description: string
+          id?: string
+          invoice_id?: string | null
+          is_billable?: boolean
+          is_invoiced?: boolean
+          receipt_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          client_id?: string | null
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          invoice_id?: string | null
+          is_billable?: boolean
+          is_invoiced?: boolean
+          receipt_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       invoice_items: {
         Row: {
           amount: number | null
@@ -156,6 +240,36 @@ export type Database = {
           },
         ]
       }
+      payment_reminders: {
+        Row: {
+          created_at: string
+          days_overdue: number
+          id: string
+          invoice_id: string
+          reminder_type: string
+          sent_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          days_overdue?: number
+          id?: string
+          invoice_id: string
+          reminder_type: string
+          sent_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          days_overdue?: number
+          id?: string
+          invoice_id?: string
+          reminder_type?: string
+          sent_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -210,6 +324,90 @@ export type Database = {
         Update: {
           created_at?: string
           id?: number
+        }
+        Relationships: []
+      }
+      quote_items: {
+        Row: {
+          amount: number | null
+          created_at: string
+          description: string
+          id: string
+          position: number
+          quantity: number
+          quote_id: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          description: string
+          id?: string
+          position?: number
+          quantity?: number
+          quote_id: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          description?: string
+          id?: string
+          position?: number
+          quantity?: number
+          quote_id?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quotes: {
+        Row: {
+          client_id: string
+          created_at: string
+          expiry_date: string | null
+          id: string
+          issue_date: string
+          notes: string | null
+          quote_number: string
+          status: string
+          subtotal: number
+          tax: number
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          quote_number: string
+          status?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          quote_number?: string
+          status?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -591,6 +789,57 @@ export type Database = {
         }
         Relationships: []
       }
+      time_entries: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          date: string
+          description: string
+          hourly_rate: number
+          hours_worked: number
+          id: string
+          invoice_id: string | null
+          is_billable: boolean
+          is_invoiced: boolean
+          project_name: string | null
+          total_amount: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          date?: string
+          description: string
+          hourly_rate?: number
+          hours_worked: number
+          id?: string
+          invoice_id?: string | null
+          is_billable?: boolean
+          is_invoiced?: boolean
+          project_name?: string | null
+          total_amount?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          date?: string
+          description?: string
+          hourly_rate?: number
+          hours_worked?: number
+          id?: string
+          invoice_id?: string | null
+          is_billable?: boolean
+          is_invoiced?: boolean
+          project_name?: string | null
+          total_amount?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           address: string | null
@@ -676,6 +925,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      convert_quote_to_invoice: {
+        Args: { quote_id: string }
+        Returns: string
+      }
       get_user_id_from_stripe_customer: {
         Args: { stripe_customer_id: string }
         Returns: string

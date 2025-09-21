@@ -6,7 +6,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SubscriptionStatus from "@/components/SubscriptionStatus";
 import Overview from "./dashboard/Overview";
 import Clients from "./dashboard/Clients";
+import Quotes from "./dashboard/Quotes";
 import Invoices from "./dashboard/Invoices";
+import TimeTracking from "./dashboard/TimeTracking";
+import Expenses from "./dashboard/Expenses";
+import Reports from "./dashboard/Reports";
 import RecurringInvoices from "./dashboard/RecurringInvoices";
 import Settings from "./dashboard/Settings";
 import Analytics from "./dashboard/Analytics";
@@ -33,7 +37,7 @@ const Dashboard = () => {
   useEffect(() => {
     updateSeo(
       "Dashboard | HonestInvoice",
-      "HonestInvoice dashboard: manage clients, invoices, and subscriptions."
+      "HonestInvoice dashboard: manage clients, quotes, invoices, time tracking, expenses and more."
     );
   }, []);
 
@@ -75,35 +79,26 @@ const Dashboard = () => {
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:flex lg:w-auto lg:justify-center gap-1 h-auto p-1">
               <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Overview</TabsTrigger>
               <TabsTrigger value="clients" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Clients</TabsTrigger>
+              <TabsTrigger value="quotes" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Quotes</TabsTrigger>
               <TabsTrigger value="invoices" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Invoices</TabsTrigger>
-              <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Analytics</TabsTrigger>
-              <TabsTrigger value="branding" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Branding</TabsTrigger>
-              <TabsTrigger value="recurring" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Recurring</TabsTrigger>
+              <TabsTrigger value="time" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Time</TabsTrigger>
+              <TabsTrigger value="expenses" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Expenses</TabsTrigger>
+              <TabsTrigger value="reports" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Reports</TabsTrigger>
               <TabsTrigger value="settings" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Settings</TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value="overview">
-            <Overview />
-          </TabsContent>
-          <TabsContent value="clients">
-            <Clients />
-          </TabsContent>
-          <TabsContent value="invoices">
-            <Invoices />
-          </TabsContent>
-          <TabsContent value="analytics">
-            <Analytics />
-          </TabsContent>
-          <TabsContent value="branding">
-            <CustomBranding />
-          </TabsContent>
-          <TabsContent value="recurring">
-            <RecurringInvoices />
-          </TabsContent>
-          <TabsContent value="settings">
-            <Settings />
-          </TabsContent>
+          <TabsContent value="overview"><Overview /></TabsContent>
+          <TabsContent value="clients"><Clients /></TabsContent>
+          <TabsContent value="quotes"><Quotes /></TabsContent>
+          <TabsContent value="invoices"><Invoices /></TabsContent>
+          <TabsContent value="time"><TimeTracking /></TabsContent>
+          <TabsContent value="expenses"><Expenses /></TabsContent>
+          <TabsContent value="reports"><Reports /></TabsContent>
+          <TabsContent value="analytics"><Analytics /></TabsContent>
+          <TabsContent value="branding"><CustomBranding /></TabsContent>
+          <TabsContent value="recurring"><RecurringInvoices /></TabsContent>
+          <TabsContent value="settings"><Settings /></TabsContent>
         </Tabs>
       </main>
     </div>
