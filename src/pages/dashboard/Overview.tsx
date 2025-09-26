@@ -6,12 +6,33 @@ import { useProAccess } from "@/hooks/useProAccess";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Crown, TrendingUp, Users, FileText, ArrowRight } from "lucide-react";
+import { useEffect } from "react";
+
+const updateSeo = (title: string, description: string) => {
+  document.title = title;
+  const ensure = (sel: string, create: () => HTMLElement) => {
+    let el = document.head.querySelector(sel) as HTMLElement | null;
+    if (!el) { el = create(); document.head.appendChild(el); }
+    return el;
+  };
+  (ensure('meta[name="description"]', () => { const m = document.createElement('meta'); m.setAttribute('name','description'); return m; }) as HTMLMetaElement)
+    .setAttribute('content', description);
+  (ensure('link[rel="canonical"]', () => { const l = document.createElement('link'); l.setAttribute('rel','canonical'); return l; }) as HTMLLinkElement)
+    .setAttribute('href', window.location.href);
+};
 
 const sb = supabase as any;
 
 const Overview = () => {
   const { user } = useAuth();
   const { isPro, isLoading: proLoading } = useProAccess();
+
+  useEffect(() => {
+    updateSeo(
+      "Dashboard Overview | HonestInvoice", 
+      "Your business at a glance: recent invoices, client activity, payment reminders, and key metrics."
+    );
+  }, []);
 
   const clientsCount = useQuery({
     queryKey: ["clients-count", user?.id],

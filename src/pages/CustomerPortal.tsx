@@ -10,14 +10,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Download, Eye, CreditCard, FileText, DollarSign, Clock } from "lucide-react";
+import { Download, Eye, CreditCard, FileText, DollarSign, Clock, CheckCircle, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { QuoteApprovalDialog } from "@/components/QuoteApprovalDialog";
+import { InvoicePaymentDialog } from "@/components/InvoicePaymentDialog";
 
 const CustomerPortal = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [customerData, setCustomerData] = useState<any>(null);
+  const [selectedQuote, setSelectedQuote] = useState<any>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [showQuoteDialog, setShowQuoteDialog] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
 
   // Check if user is a customer portal user
   useEffect(() => {
@@ -102,23 +108,14 @@ const CustomerPortal = () => {
     enabled: !!customerData?.client_id,
   });
 
-  const handleQuoteApproval = async (quoteId: string, action: 'approve' | 'reject') => {
-    const { error } = await supabase
-      .from("quotes")
-      .update({ status: action === 'approve' ? 'approved' : 'rejected' })
-      .eq("id", quoteId);
-
-    if (error) {
-      toast.error("Failed to update quote");
-      return;
-    }
-
-    toast.success(`Quote ${action}d successfully`);
+  const handleQuoteApproval = (quote: any, action: 'approve' | 'reject') => {
+    setSelectedQuote(quote);
+    setShowQuoteDialog(true);
   };
 
-  const handlePayment = (invoiceId: string) => {
-    // This would integrate with Stripe or other payment processor
-    toast.info("Payment integration would be implemented here");
+  const handlePayment = (invoice: any) => {
+    setSelectedInvoice(invoice);
+    setShowPaymentDialog(true);
   };
 
   const downloadInvoice = async (invoiceId: string, invoiceNumber: string) => {
@@ -275,10 +272,12 @@ const CustomerPortal = () => {
                               {(invoice.status === 'sent' || invoice.status === 'overdue') && (
                                 <Button
                                   size="sm"
-                                  onClick={() => handlePayment(invoice.id)}
+                                  onClick={() => handlePayment(invoice)}
                                   title="Pay Now"
+                                  className="bg-primary hover:bg-primary/90"
                                 >
-                                  <CreditCard className="h-4 w-4" />
+                                  <CreditCard className="h-4 w-4 mr-1" />
+                                  Pay Now
                                 </Button>
                               )}
                             </div>
@@ -337,17 +336,20 @@ const CustomerPortal = () => {
                                 <>
                                   <Button
                                     size="sm"
-                                    onClick={() => handleQuoteApproval(quote.id, 'approve')}
+                                    onClick={() => handleQuoteApproval(quote, 'approve')}
                                     title="Approve Quote"
+                                    className="bg-green-600 hover:bg-green-700"
                                   >
+                                    <CheckCircle className="h-4 w-4 mr-1" />
                                     Approve
                                   </Button>
                                   <Button
                                     size="sm"
-                                    variant="outline"
-                                    onClick={() => handleQuoteApproval(quote.id, 'reject')}
+                                    variant="destructive"
+                                    onClick={() => handleQuoteApproval(quote, 'reject')}
                                     title="Reject Quote"
                                   >
+                                    <XCircle className="h-4 w-4 mr-1" />
                                     Reject
                                   </Button>
                                 </>
@@ -397,6 +399,25 @@ const CustomerPortal = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialogs */}
+        <QuoteApprovalDialog
+          quote={selectedQuote}
+          isOpen={showQuoteDialog}
+          onClose={() => {
+            setShowQuoteDialog(false);
+            setSelectedQuote(null);
+          }}
+        />
+        
+        <InvoicePaymentDialog
+          invoice={selectedInvoice}
+          isOpen={showPaymentDialog}
+          onClose={() => {
+            setShowPaymentDialog(false);
+            setSelectedInvoice(null);
+          }}
+        />
       </div>
     </div>
   );

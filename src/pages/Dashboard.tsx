@@ -11,6 +11,7 @@ import Invoices from "./dashboard/Invoices";
 import TimeTracking from "./dashboard/TimeTracking";
 import Expenses from "./dashboard/Expenses";
 import Reports from "./dashboard/Reports";
+import PaymentReminders from "./dashboard/PaymentReminders";
 import RecurringInvoices from "./dashboard/RecurringInvoices";
 import Settings from "./dashboard/Settings";
 import Analytics from "./dashboard/Analytics";
@@ -83,6 +84,7 @@ const Dashboard = () => {
               <TabsTrigger value="invoices" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Invoices</TabsTrigger>
               <TabsTrigger value="time" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Time</TabsTrigger>
               <TabsTrigger value="expenses" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Expenses</TabsTrigger>
+              <TabsTrigger value="reminders" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Reminders</TabsTrigger>
               <TabsTrigger value="reports" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Reports</TabsTrigger>
               <TabsTrigger value="settings" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Settings</TabsTrigger>
             </TabsList>
@@ -94,6 +96,7 @@ const Dashboard = () => {
           <TabsContent value="invoices"><Invoices /></TabsContent>
           <TabsContent value="time"><TimeTracking /></TabsContent>
           <TabsContent value="expenses"><Expenses /></TabsContent>
+          <TabsContent value="reminders"><PaymentReminders /></TabsContent>
           <TabsContent value="reports"><Reports /></TabsContent>
           <TabsContent value="analytics"><Analytics /></TabsContent>
           <TabsContent value="branding"><CustomBranding /></TabsContent>
