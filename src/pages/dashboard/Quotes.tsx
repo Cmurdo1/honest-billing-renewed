@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Trash2, Plus, FileText, CheckCircle } from "lucide-react";
+import { Trash2, Plus, FileText, CircleCheck as CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 
 const Quotes = () => {
@@ -73,16 +73,30 @@ const Quotes = () => {
 
   const addQuote = useMutation({
     mutationFn: async (quoteData: any) => {
-      const total = parseFloat(subtotal) + parseFloat(tax);
-      
+      if (!user?.id) {
+        throw new Error("User not authenticated");
+      }
+
+      if (!clientId) {
+        throw new Error("Please select a client");
+      }
+
+      if (!subtotal || isNaN(parseFloat(subtotal))) {
+        throw new Error("Please enter a valid subtotal");
+      }
+
+      const subtotalNum = parseFloat(subtotal);
+      const taxNum = parseFloat(tax) || 0;
+      const total = subtotalNum + taxNum;
+
       const { data: quote, error: quoteError } = await supabase
         .from("quotes")
         .insert({
           user_id: user.id,
           client_id: clientId,
           quote_number: quoteNumber,
-          subtotal: parseFloat(subtotal),
-          tax: parseFloat(tax),
+          subtotal: subtotalNum,
+          tax: taxNum,
           total,
           notes,
           expiry_date: expiryDate || null,
@@ -122,8 +136,9 @@ const Quotes = () => {
       setNotes("");
       setItems([{ description: "", quantity: 1, unitPrice: 0 }]);
     },
-    onError: (error) => {
-      toast.error("Failed to create quote");
+    onError: (error: any) => {
+      const errorMessage = error?.message || "Failed to create quote";
+      toast.error(errorMessage);
       console.error("Error creating quote:", error);
     },
   });
