@@ -24,14 +24,20 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+<<<<<<< HEAD
     // First, try basic invoice query
     console.log('Querying invoice...');
     const { data: invoiceData, error: invoiceError } = await supabase
+=======
+    // 1. Get invoice
+    const { data: invoice, error: invoiceError } = await supabase
+>>>>>>> fix-invoice-pdf-email
       .from('invoices')
       .select('*')
       .eq('id', invoiceId)
       .single();
 
+<<<<<<< HEAD
     if (invoiceError) {
       console.error('Invoice query error:', invoiceError);
       throw new Error(`Invoice query failed: ${invoiceError.message}`);
@@ -74,6 +80,35 @@ serve(async (req) => {
     };
 
     if (!invoice.client?.email) {
+=======
+    if (invoiceError || !invoice) {
+      throw new Error(`Invoice not found: ${invoiceError?.message}`);
+    }
+
+    // 2. Get client details
+    const { data: client, error: clientError } = await supabase
+      .from('clients')
+      .select('name, email, company')
+      .eq('id', invoice.client_id)
+      .single();
+
+    if (clientError || !client) {
+      throw new Error(`Client not found for invoice: ${clientError?.message}`);
+    }
+
+    // 3. Get user settings
+    const { data: userSettings, error: settingsError } = await supabase
+      .from('user_settings')
+      .select('display_name, company_name')
+      .eq('user_id', invoice.user_id)
+      .single();
+
+    if (settingsError) {
+      console.error('Could not fetch user settings:', settingsError.message);
+    }
+
+    if (!client.email) {
+>>>>>>> fix-invoice-pdf-email
       throw new Error('Client email not found');
     }
 
@@ -116,8 +151,8 @@ serve(async (req) => {
     `;
 
     const emailResponse = await resend.emails.send({
-      from: 'invoices@resend.dev', // You'll need to configure this with your verified domain
-      to: [invoice.client.email],
+      from: 'noreply@yourdomain.com', // TODO: Replace with your verified Resend domain
+      to: [client.email],
       subject: `Invoice ${invoice.number} from ${companyName}`,
       html: emailHtml,
     });

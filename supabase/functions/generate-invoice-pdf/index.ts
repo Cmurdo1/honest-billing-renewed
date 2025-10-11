@@ -21,17 +21,51 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+<<<<<<< HEAD
     // First, try basic invoice query
     console.log('Querying invoice...');
     const { data: invoiceData, error: invoiceError } = await supabase
+=======
+    // 1. Get invoice
+    const { data: invoice, error: invoiceError } = await supabase
+>>>>>>> fix-invoice-pdf-email
       .from('invoices')
       .select('*')
       .eq('id', invoiceId)
       .single();
 
+<<<<<<< HEAD
     if (invoiceError) {
       console.error('Invoice query error:', invoiceError);
       throw new Error(`Invoice query failed: ${invoiceError.message}`);
+=======
+    if (invoiceError || !invoice) {
+      throw new Error(`Invoice not found: ${invoiceError?.message}`);
+    }
+
+    // 2. Get client details
+    const { data: client, error: clientError } = await supabase
+      .from('clients')
+      .select('name, email, company, address')
+      .eq('id', invoice.client_id)
+      .single();
+
+    if (clientError) {
+      // Not a fatal error, we can proceed without client details
+      console.error('Could not fetch client details:', clientError.message);
+    }
+
+    // 3. Get user settings
+    const { data: userSettings, error: settingsError } = await supabase
+      .from('user_settings')
+      .select('display_name, company_name, address')
+      .eq('user_id', invoice.user_id)
+      .single();
+
+    if (settingsError) {
+      // Not a fatal error, proceed with defaults
+      console.error('Could not fetch user settings:', settingsError.message);
+>>>>>>> fix-invoice-pdf-email
     }
 
     if (!invoiceData) {
@@ -104,16 +138,29 @@ serve(async (req) => {
         <div class="invoice-details">
           <div class="company-info">
             <h3>From:</h3>
+<<<<<<< HEAD
             <p><strong>${companyName}</strong></p>
             <p>${companyAddress}</p>
+=======
+            <p><strong>${userSettings?.display_name || 'Your Business'}</strong></p>
+            <p>${userSettings?.company_name || ''}</p>
+            <p>${userSettings?.address || ''}</p>
+>>>>>>> fix-invoice-pdf-email
           </div>
           
           <div class="client-info">
             <h3>Bill To:</h3>
+<<<<<<< HEAD
             <p><strong>${clientName}</strong></p>
             <p>${clientCompany}</p>
             <p>${clientAddress}</p>
             <p>${invoice.client?.email || ''}</p>
+=======
+            <p><strong>${client?.name || 'N/A'}</strong></p>
+            <p>${client?.company || ''}</p>
+            <p>${client?.address || ''}</p>
+            <p>${client?.email || ''}</p>
+>>>>>>> fix-invoice-pdf-email
           </div>
         </div>
         
@@ -164,6 +211,7 @@ serve(async (req) => {
       </html>
     `;
 
+<<<<<<< HEAD
     // Convert HTML to PDF - simplified version returns HTML for now
     // For production PDF generation, consider using a different approach
     const htmlContent = html;
@@ -174,6 +222,14 @@ serve(async (req) => {
         'Content-Type': 'text/html',
         'Content-Disposition': `attachment; filename="invoice-${invoice.number}.html"`
       }
+=======
+    // Return the HTML to be opened in a new tab
+    return new Response(html, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/html',
+      },
+>>>>>>> fix-invoice-pdf-email
     });
 
   } catch (error) {

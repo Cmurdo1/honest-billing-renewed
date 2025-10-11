@@ -87,8 +87,9 @@ const Invoices = () => {
     onError: (e: any) => toast.error(e.message || "Failed to create invoice"),
   });
 
-  const downloadPDF = async (invoiceId: string, invoiceNumber: string) => {
+  const downloadPDF = async (invoiceId: string) => {
     try {
+<<<<<<< HEAD
       const { data: { session } } = await supabase.auth.getSession();
       
       const response = await supabase.functions.invoke('generate-invoice-pdf', {
@@ -113,6 +114,20 @@ const Invoices = () => {
       window.URL.revokeObjectURL(url);
       
       toast.success("Invoice downloaded successfully");
+=======
+      const { data, error } = await supabase.functions.invoke('generate-invoice-pdf', {
+        body: { invoiceId },
+      });
+
+      if (error) throw error;
+
+      // The function now returns HTML, so we open it in a new tab
+      const blob = new Blob([data], { type: 'text/html' });
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      toast.success("Invoice opened in new tab. Use Print to save as PDF.");
+
+>>>>>>> fix-invoice-pdf-email
     } catch (error: any) {
       console.error('PDF generation error:', error);
       toast.error("Failed to generate invoice: " + (error.message || 'Unknown error'));
@@ -254,7 +269,7 @@ const Invoices = () => {
                                 size="sm" 
                                 variant="secondary" 
                                 className="flex items-center gap-1 text-xs px-2"
-                                onClick={() => downloadPDF(inv.id, inv.number)}
+                                onClick={() => downloadPDF(inv.id)}
                               >
                                 <Download className="h-3 w-3" />
                                 <span className="hidden sm:inline">HTML</span>
