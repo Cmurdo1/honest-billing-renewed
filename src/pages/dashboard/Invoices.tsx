@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,9 +10,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { useProAccess } from "@/hooks/useProAccess";
-import { Download, Send, Crown } from "lucide-react";
+import { Download, Send, Crown, Trash } from "lucide-react";
 
 const sb = supabase as any;
+
+interface InvoiceItem {
+  description: string;
+  quantity: number | string;
+  unit_price: number | string;
+}
 
 const Invoices = () => {
   const { user } = useAuth();
@@ -21,10 +27,10 @@ const Invoices = () => {
 
   const [number, setNumber] = useState("");
   const [clientId, setClientId] = useState<string>("");
-  const [subtotal, setSubtotal] = useState("");
-  const [tax, setTax] = useState("");
   const [status, setStatus] = useState("draft");
   const [dueDate, setDueDate] = useState<string>("");
+  const [items, setItems] = useState<InvoiceItem[]>([{ description: "", quantity: 1, unit_price: "" }]);
+  const [taxRate, setTaxRate] = useState(""); // As a percentage
 
   const clients = useQuery({
     queryKey: ["invoice-clients", user?.id],
@@ -54,12 +60,26 @@ const Invoices = () => {
     },
   });
 
+  const { subtotal, taxAmount, total } = useMemo(() => {
+    const subtotal = items.reduce((acc, item) => {
+      const quantity = Number(item.quantity) || 0;
+      const price = Number(item.unit_price) || 0;
+      return acc + quantity * price;
+    }, 0);
+    const tax = subtotal * (Number(taxRate) / 100);
+    const total = subtotal + tax;
+    return { subtotal, taxAmount: tax, total };
+  }, [items, taxRate]);
+
   const addInvoice = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Not authenticated");
       if (!clientId) throw new Error("Please choose a client");
-      const total = Number(subtotal || 0) + Number(tax || 0);
-      const { error } = await sb.from("invoices").insert([
+      if (items.some(item => !item.description || !item.quantity || !item.unit_price)) {
+        throw new Error("Please fill all item fields.");
+      }
+
+      const { data: invoiceData, error: invoiceError } = await sb.from("invoices").insert([
         {
           user_id: user.id,
           client_id: clientId,
@@ -67,67 +87,73 @@ const Invoices = () => {
           status,
           issue_date: new Date().toISOString().slice(0, 10),
           due_date: dueDate || null,
-          subtotal: Number(subtotal || 0),
-          tax: Number(tax || 0),
-          total,
+          subtotal: subtotal,
+          tax: taxAmount,
+          total: total,
         },
-      ]);
-      if (error) throw error;
+      ]).select();
+
+      if (invoiceError) throw invoiceError;
+
+      const invoiceId = invoiceData[0].id;
+      const invoiceItems = items.map(item => ({
+        invoice_id: invoiceId,
+        description: item.description,
+        quantity: Number(item.quantity),
+        unit_price: Number(item.unit_price),
+      }));
+
+      const { error: itemsError } = await sb.from("invoice_items").insert(invoiceItems);
+
+      if (itemsError) {
+        // Attempt to clean up the created invoice if items fail to insert
+        await sb.from("invoices").delete().eq("id", invoiceId);
+        throw itemsError;
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["invoices", user?.id] });
       setNumber("");
       setClientId("");
-      setSubtotal("");
-      setTax("");
+      setItems([{ description: "", quantity: 1, unit_price: "" }]);
+      setTaxRate("");
       setStatus("draft");
       setDueDate("");
-      toast.success("Invoice created");
+      toast.success("Invoice created successfully");
     },
     onError: (e: any) => toast.error(e.message || "Failed to create invoice"),
   });
 
+  const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
+    const newItems = [...items];
+    newItems[index][field] = value;
+    setItems(newItems);
+  };
+
+  const addItem = () => {
+    setItems([...items, { description: "", quantity: 1, unit_price: "" }]);
+  };
+
+  const removeItem = (index: number) => {
+    if (items.length > 1) {
+      const newItems = items.filter((_, i) => i !== index);
+      setItems(newItems);
+    }
+  };
+
   const downloadPDF = async (invoiceId: string) => {
     try {
-<<<<<<< HEAD
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const response = await supabase.functions.invoke('generate-invoice-pdf', {
-        body: { invoiceId },
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-      });
-      
-      if (response.error) throw response.error;
-      
-      // Handle HTML content
-      const htmlContent = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
-      const blob = new Blob([htmlContent], { type: 'text/html' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `invoice-${invoiceNumber}.html`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      
-      toast.success("Invoice downloaded successfully");
-=======
       const { data, error } = await supabase.functions.invoke('generate-invoice-pdf', {
         body: { invoiceId },
       });
 
       if (error) throw error;
 
-      // The function now returns HTML, so we open it in a new tab
       const blob = new Blob([data], { type: 'text/html' });
       const url = window.URL.createObjectURL(blob);
       window.open(url, '_blank');
       toast.success("Invoice opened in new tab. Use Print to save as PDF.");
 
->>>>>>> fix-invoice-pdf-email
     } catch (error: any) {
       console.error('PDF generation error:', error);
       toast.error("Failed to generate invoice: " + (error.message || 'Unknown error'));
@@ -162,7 +188,7 @@ const Invoices = () => {
         </CardHeader>
         <CardContent>
           <form
-            className="grid grid-cols-1 gap-4 md:grid-cols-3"
+            className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
             onSubmit={(e) => {
               e.preventDefault();
               addInvoice.mutate();
@@ -174,7 +200,7 @@ const Invoices = () => {
             </div>
             <div>
               <Label>Client</Label>
-              <Select value={clientId} onValueChange={setClientId}>
+              <Select value={clientId} onValueChange={setClientId} required>
                 <SelectTrigger>
                   <SelectValue placeholder="Select client" />
                 </SelectTrigger>
@@ -189,14 +215,54 @@ const Invoices = () => {
               <Label htmlFor="due">Due date</Label>
               <Input id="due" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
             </div>
-            <div>
-              <Label htmlFor="subtotal">Subtotal</Label>
-              <Input id="subtotal" type="number" step="0.01" value={subtotal} onChange={(e) => setSubtotal(e.target.value)} />
+
+            <div className="md:col-span-2 lg:col-span-3 space-y-4">
+              <Label>Items</Label>
+              <div className="space-y-2">
+                {items.map((item, index) => (
+                  <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <Input
+                      placeholder="Item description"
+                      value={item.description}
+                      onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                      className="w-full"
+                      required
+                    />
+                    <div className="flex gap-2 w-full sm:w-auto">
+                      <Input
+                        type="number"
+                        placeholder="Qty"
+                        value={item.quantity}
+                        onChange={(e) => handleItemChange(index, "quantity", e.target.value ? Number(e.target.value) : "")}
+                        className="w-1/2 sm:w-20"
+                        min="1"
+                        required
+                      />
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="Unit Price"
+                        value={item.unit_price}
+                        onChange={(e) => handleItemChange(index, "unit_price", e.target.value ? Number(e.target.value) : "")}
+                        className="w-1/2 sm:w-28"
+                        min="0"
+                        required
+                      />
+                    </div>
+                    <Button type="button" variant="destructive" size="icon" onClick={() => removeItem(index)} disabled={items.length <= 1}>
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={addItem}>Add Item</Button>
             </div>
+
             <div>
-              <Label htmlFor="tax">Tax</Label>
-              <Input id="tax" type="number" step="0.01" value={tax} onChange={(e) => setTax(e.target.value)} />
+              <Label htmlFor="tax">Tax Rate (%)</Label>
+              <Input id="tax" type="number" step="0.01" value={taxRate} onChange={(e) => setTaxRate(e.target.value)} placeholder="e.g. 10" />
             </div>
+
             <div>
               <Label>Status</Label>
               <Select value={status} onValueChange={setStatus}>
@@ -212,7 +278,12 @@ const Invoices = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="md:col-span-3">
+
+            <div className="md:col-span-2 lg:col-span-3">
+              <div className="text-lg font-semibold">Total: ${total.toFixed(2)}</div>
+            </div>
+
+            <div className="md:col-span-2 lg:col-span-3">
               <Button type="submit" disabled={addInvoice.isPending}>Create Invoice</Button>
             </div>
           </form>
