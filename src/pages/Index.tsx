@@ -102,7 +102,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       <header className="border-b">
-        <div className="container mx-auto flex items-center justify-between py-4">
+        <div className="container mx-auto flex items-center justify-between py-4 px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">HI</span>
             <span className="font-semibold">HonestInvoice</span>
@@ -111,7 +111,7 @@ const Index = () => {
             <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-foreground">Features</button>
             <button onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-foreground">Pricing</button>
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 md:ml-auto">
             {user ? (
               <>
                 <Button variant="ghost" onClick={() => navigate("/dashboard")}>Dashboard</Button>
