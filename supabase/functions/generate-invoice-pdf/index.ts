@@ -13,7 +13,6 @@ serve(async (req) => {
 
   try {
     const { invoiceId } = await req.json();
-    console.log('Received invoiceId:', invoiceId);
     
     // Create Supabase client
     const supabase = createClient(
@@ -21,24 +20,13 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-<<<<<<< HEAD
-    // First, try basic invoice query
-    console.log('Querying invoice...');
-    const { data: invoiceData, error: invoiceError } = await supabase
-=======
     // 1. Get invoice
     const { data: invoice, error: invoiceError } = await supabase
->>>>>>> fix-invoice-pdf-email
       .from('invoices')
       .select('*')
       .eq('id', invoiceId)
       .single();
 
-<<<<<<< HEAD
-    if (invoiceError) {
-      console.error('Invoice query error:', invoiceError);
-      throw new Error(`Invoice query failed: ${invoiceError.message}`);
-=======
     if (invoiceError || !invoice) {
       throw new Error(`Invoice not found: ${invoiceError?.message}`);
     }
@@ -65,50 +53,7 @@ serve(async (req) => {
     if (settingsError) {
       // Not a fatal error, proceed with defaults
       console.error('Could not fetch user settings:', settingsError.message);
->>>>>>> fix-invoice-pdf-email
     }
-
-    if (!invoiceData) {
-      console.error('No invoice found with ID:', invoiceId);
-      throw new Error('Invoice not found in database');
-    }
-
-    console.log('Invoice found:', invoiceData);
-
-    // Get client details
-    console.log('Querying client...');
-    const { data: clientData, error: clientError } = await supabase
-      .from('clients')
-      .select('name, email, company, address')
-      .eq('id', invoiceData.client_id)
-      .single();
-
-    if (clientError) {
-      console.error('Client query error:', clientError);
-    }
-
-    // Get user settings
-    console.log('Querying user settings...');
-    const { data: userSettings, error: userError } = await supabase
-      .from('user_settings')
-      .select('display_name, company_name, address')
-      .eq('user_id', invoiceData.user_id)
-      .single();
-
-    if (userError) {
-      console.error('User settings query error:', userError);
-    }
-
-    const invoice = {
-      ...invoiceData,
-      client: clientData
-    };
-
-    const companyName = userSettings?.company_name || userSettings?.display_name || 'Your Business';
-    const companyAddress = userSettings?.address || '';
-    const clientName = invoice.client?.name || 'Client';
-    const clientCompany = invoice.client?.company || '';
-    const clientAddress = invoice.client?.address || '';
 
     // Generate HTML for PDF
     const html = `
@@ -138,29 +83,17 @@ serve(async (req) => {
         <div class="invoice-details">
           <div class="company-info">
             <h3>From:</h3>
-<<<<<<< HEAD
-            <p><strong>${companyName}</strong></p>
-            <p>${companyAddress}</p>
-=======
             <p><strong>${userSettings?.display_name || 'Your Business'}</strong></p>
             <p>${userSettings?.company_name || ''}</p>
             <p>${userSettings?.address || ''}</p>
->>>>>>> fix-invoice-pdf-email
           </div>
           
           <div class="client-info">
             <h3>Bill To:</h3>
-<<<<<<< HEAD
-            <p><strong>${clientName}</strong></p>
-            <p>${clientCompany}</p>
-            <p>${clientAddress}</p>
-            <p>${invoice.client?.email || ''}</p>
-=======
             <p><strong>${client?.name || 'N/A'}</strong></p>
             <p>${client?.company || ''}</p>
             <p>${client?.address || ''}</p>
             <p>${client?.email || ''}</p>
->>>>>>> fix-invoice-pdf-email
           </div>
         </div>
         
@@ -211,25 +144,12 @@ serve(async (req) => {
       </html>
     `;
 
-<<<<<<< HEAD
-    // Convert HTML to PDF - simplified version returns HTML for now
-    // For production PDF generation, consider using a different approach
-    const htmlContent = html;
-
-    return new Response(htmlContent, {
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'text/html',
-        'Content-Disposition': `attachment; filename="invoice-${invoice.number}.html"`
-      }
-=======
     // Return the HTML to be opened in a new tab
     return new Response(html, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'text/html',
       },
->>>>>>> fix-invoice-pdf-email
     });
 
   } catch (error) {

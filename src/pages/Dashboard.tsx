@@ -43,7 +43,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       <header className="px-4 sm:px-6 py-4 border-b border-primary/20 bg-gradient-to-r from-background to-primary/5">
         {/* Mobile layout - stacked */}
         <div className="flex flex-col gap-3 sm:hidden">
@@ -74,8 +74,8 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <main>
-        <Tabs defaultValue={defaultTab} className="container mx-auto px-4 py-4 sm:py-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Tabs defaultValue={defaultTab}>
           <div className="mb-6 sm:mb-8">
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:flex lg:w-auto lg:justify-center gap-1 h-auto p-1">
               <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Overview</TabsTrigger>

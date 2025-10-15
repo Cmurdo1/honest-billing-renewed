@@ -102,7 +102,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       <header className="border-b">
-        <div className="container mx-auto flex items-center justify-between py-4">
+        <div className="container mx-auto flex items-center justify-between py-4 px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">HI</span>
             <span className="font-semibold">HonestInvoice</span>
@@ -111,7 +111,7 @@ const Index = () => {
             <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-foreground">Features</button>
             <button onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-foreground">Pricing</button>
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 md:ml-auto">
             {user ? (
               <>
                 <Button variant="ghost" onClick={() => navigate("/dashboard")}>Dashboard</Button>
@@ -126,36 +126,36 @@ const Index = () => {
 
       <main>
         {/* Hero */}
-        <section className="container mx-auto py-20 md:py-28 text-center">
+        <section className="container mx-auto py-16 px-4 sm:py-20 md:py-28 text-center">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 blur-3xl -z-10"></div>
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight max-w-3xl mx-auto bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight max-w-3xl mx-auto bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
               Invoicing that's honest, fast, and effortless
             </h1>
           </div>
-          <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="mt-4 text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Manage clients, create professional invoices, and get paid quickly.
             Everything you need, nothing you don't.
           </p>
-          <div className="mt-8 flex items-center justify-center gap-3">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             {user ? (
-              <Button size="lg" onClick={() => navigate("/dashboard")}>Go to Dashboard</Button>
+              <Button size="lg" onClick={() => navigate("/dashboard")} className="w-full sm:w-auto">Go to Dashboard</Button>
             ) : (
               <>
-                <Button size="lg" onClick={() => navigate("/auth")}>Get started</Button>
-                <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>Sign in</Button>
+                <Button size="lg" onClick={() => navigate("/auth")} className="w-full sm:w-auto">Get started</Button>
+                <Button size="lg" variant="outline" onClick={() => navigate("/auth")} className="w-full sm:w-auto">Sign in</Button>
               </>
             )}
           </div>
         </section>
 
         {/* Features */}
-        <section id="features" className="container mx-auto py-12 md:py-16">
+        <section id="features" className="container mx-auto py-12 md:py-16 px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Everything you need to invoice professionally</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">Simple tools that work together to help you manage your business and get paid faster.</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-4">Everything you need to invoice professionally</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">Simple tools that work together to help you manage your business and get paid faster.</p>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card className="border-primary/20 hover:border-primary/40 transition-colors">
               <CardHeader>
                 <CardTitle className="text-primary">Client management</CardTitle>
@@ -169,7 +169,7 @@ const Index = () => {
                     "Contact info at a glance",
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2">
-                      <Check className="text-primary" />
+                      <Check className="text-primary h-5 w-5" />
                       <span>{f}</span>
                     </li>
                   ))}
@@ -189,14 +189,14 @@ const Index = () => {
                     "PDF export and sharing",
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2">
-                      <Check className="text-primary" />
+                      <Check className="text-primary h-5 w-5" />
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
             </Card>
-            <Card className="border-primary/20 hover:border-primary/40 transition-colors">
+            <Card className="border-primary/20 hover:border-primary/40 transition-colors md:col-span-2 lg:col-span-1">
               <CardHeader>
                 <CardTitle className="text-primary">Stay organized</CardTitle>
                 <CardDescription>Track status and keep everything tidy.</CardDescription>
@@ -209,7 +209,7 @@ const Index = () => {
                     "Exportable reports",
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2">
-                      <Check className="text-primary" />
+                      <Check className="text-primary h-5 w-5" />
                       <span>{f}</span>
                     </li>
                   ))}
@@ -220,14 +220,14 @@ const Index = () => {
         </section>
 
         {/* Pricing */}
-        <section id="pricing" className="container mx-auto py-16 md:py-24">
+        <section id="pricing" className="container mx-auto py-16 md:py-24 px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Simple, honest pricing</h2>
-            <p className="mt-2 text-muted-foreground">Start free and upgrade anytime.</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Simple, honest pricing</h2>
+            <p className="mt-2 text-muted-foreground text-sm sm:text-base">Start free and upgrade anytime.</p>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {plans.map((plan) => (
-              <Card key={plan.name} className={plan.highlight ? "border-primary shadow-md" : undefined}>
+              <Card key={plan.name} className={`${plan.highlight ? "border-primary shadow-md" : ""} ${plans.length === 2 && "md:col-span-1"}`}>
                 <CardHeader>
                   <CardTitle className="flex items-baseline justify-between">
                     <span>{plan.name}</span>
@@ -244,7 +244,7 @@ const Index = () => {
                   <ul className="space-y-2 text-sm">
                     {plan.features.map((f: string) => (
                       <li key={f} className="flex items-start gap-2">
-                        <Check className="text-primary" />
+                        <Check className="text-primary h-5 w-5" />
                         <span>{f}</span>
                       </li>
                     ))}

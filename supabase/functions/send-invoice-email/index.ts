@@ -14,7 +14,6 @@ serve(async (req) => {
 
   try {
     const { invoiceId } = await req.json();
-    console.log('Received invoiceId:', invoiceId);
     
     const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
     
@@ -24,63 +23,13 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-<<<<<<< HEAD
-    // First, try basic invoice query
-    console.log('Querying invoice...');
-    const { data: invoiceData, error: invoiceError } = await supabase
-=======
     // 1. Get invoice
     const { data: invoice, error: invoiceError } = await supabase
->>>>>>> fix-invoice-pdf-email
       .from('invoices')
       .select('*')
       .eq('id', invoiceId)
       .single();
 
-<<<<<<< HEAD
-    if (invoiceError) {
-      console.error('Invoice query error:', invoiceError);
-      throw new Error(`Invoice query failed: ${invoiceError.message}`);
-    }
-
-    if (!invoiceData) {
-      console.error('No invoice found with ID:', invoiceId);
-      throw new Error('Invoice not found in database');
-    }
-
-    console.log('Invoice found:', invoiceData);
-
-    // Get client details
-    console.log('Querying client...');
-    const { data: clientData, error: clientError } = await supabase
-      .from('clients')
-      .select('name, email, company')
-      .eq('id', invoiceData.client_id)
-      .single();
-
-    if (clientError) {
-      console.error('Client query error:', clientError);
-    }
-
-    // Get user settings
-    console.log('Querying user settings...');
-    const { data: userSettings, error: userError } = await supabase
-      .from('user_settings')
-      .select('display_name, company_name')
-      .eq('user_id', invoiceData.user_id)
-      .single();
-
-    if (userError) {
-      console.error('User settings query error:', userError);
-    }
-
-    const invoice = {
-      ...invoiceData,
-      client: clientData
-    };
-
-    if (!invoice.client?.email) {
-=======
     if (invoiceError || !invoice) {
       throw new Error(`Invoice not found: ${invoiceError?.message}`);
     }
@@ -108,7 +57,6 @@ serve(async (req) => {
     }
 
     if (!client.email) {
->>>>>>> fix-invoice-pdf-email
       throw new Error('Client email not found');
     }
 
