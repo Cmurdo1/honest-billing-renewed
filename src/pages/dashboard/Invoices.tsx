@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +31,42 @@ const Invoices = () => {
   const [dueDate, setDueDate] = useState<string>("");
   const [items, setItems] = useState<InvoiceItem[]>([{ description: "", quantity: 1, unit_price: "" }]);
   const [taxRate, setTaxRate] = useState(""); // As a percentage
+
+  const { data: latestInvoice, isLoading: isLoadingLatestInvoice } = useQuery({
+    queryKey: ["latest-invoice-number", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await sb
+        .from("invoices")
+        .select("number")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 means no rows found, which is expected for a new user
+        throw error;
+      }
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (isLoadingLatestInvoice) {
+      setNumber("...");
+    } else if (latestInvoice && latestInvoice.number) {
+      const lastNum = parseInt(latestInvoice.number, 10);
+      if (!isNaN(lastNum)) {
+        setNumber((lastNum + 1).toString());
+      } else {
+        setNumber("1");
+      }
+    } else {
+      setNumber("1");
+    }
+  }, [latestInvoice, isLoadingLatestInvoice]);
 
   const clients = useQuery({
     queryKey: ["invoice-clients", user?.id],
@@ -196,7 +232,7 @@ const Invoices = () => {
           >
             <div>
               <Label htmlFor="number">Invoice #</Label>
-              <Input id="number" value={number} onChange={(e) => setNumber(e.target.value)} required />
+              <Input id="number" value={number} readOnly disabled={isLoadingLatestInvoice} />
             </div>
             <div>
               <Label>Client</Label>
@@ -284,7 +320,7 @@ const Invoices = () => {
             </div>
 
             <div className="md:col-span-2 lg:col-span-3">
-              <Button type="submit" disabled={addInvoice.isPending}>Create Invoice</Button>
+              <Button type="submit" disabled={addInvoice.isPending || isLoadingLatestInvoice}>Create Invoice</Button>
             </div>
           </form>
         </CardContent>
