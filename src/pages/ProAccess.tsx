@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRequireProAccess } from '@/hooks/useProAccess';
-import Header from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Crown, CheckCircle, Zap, BarChart, Palette } from 'lucide-react';
@@ -28,7 +27,6 @@ const ProAccess = () => {
   if (hasAccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/5 to-primary/10 p-8">
-        <Header />
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <Badge variant="default" className="mb-4">
@@ -112,8 +110,7 @@ const ProAccess = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-primary/10 p-8">
-      <Header />
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center p-8">
       <Card className="max-w-2xl w-full border-primary/20">
         <CardHeader className="text-center pb-8">
           <div className="flex justify-center mb-4">

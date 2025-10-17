@@ -1,6 +1,5 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import Header from "@/components/Header";
 
 const NotFound = () => {
   const location = useLocation();
@@ -13,16 +12,13 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex items-center justify-center" style={{minHeight: 'calc(100vh - 65px)'}}>
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">404</h1>
-          <p className="text-xl text-muted-foreground mb-4">Oops! Page not found</p>
-          <a href="/" className="text-primary underline-offset-4 hover:underline">
-            Return to Home
-          </a>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-4">404</h1>
+        <p className="text-xl text-muted-foreground mb-4">Oops! Page not found</p>
+        <a href="/" className="text-primary underline-offset-4 hover:underline">
+          Return to Home
+        </a>
       </div>
     </div>
   );
