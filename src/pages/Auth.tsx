@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
@@ -78,9 +79,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="px-4 py-6">
-        <h1 className="sr-only">HonestInvoice Account</h1>
-      </header>
+      <Header />
       <main className="container mx-auto max-w-md px-4">
         <section aria-labelledby="auth-title" className="mt-10">
           <div className="rounded-lg border bg-card p-6 shadow-sm">

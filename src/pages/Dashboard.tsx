@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import Header from "@/components/Header";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SubscriptionStatus from "@/components/SubscriptionStatus";
 import Overview from "./dashboard/Overview";
@@ -44,35 +45,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
-      <header className="px-4 sm:px-6 py-4 border-b border-primary/20 bg-gradient-to-r from-background to-primary/5">
-        {/* Mobile layout - stacked */}
-        <div className="flex flex-col gap-3 sm:hidden">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-sm">HI</span>
-              <h1 className="text-xl font-semibold text-primary">Dashboard</h1>
-            </div>
-            <Button variant="secondary" size="sm" onClick={signOut}>Sign out</Button>
-          </div>
-          <div className="flex justify-center">
-            <SubscriptionStatus />
-          </div>
-        </div>
-        
-        {/* Desktop layout - single row */}
-        <div className="hidden sm:flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">HI</span>
-              <h1 className="text-2xl font-semibold text-primary">Dashboard</h1>
-            </div>
-            <SubscriptionStatus />
-          </div>
-          <div>
-            <Button variant="secondary" onClick={signOut}>Sign out</Button>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue={defaultTab}>

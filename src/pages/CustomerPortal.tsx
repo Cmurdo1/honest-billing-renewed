@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { QuoteApprovalDialog } from "@/components/QuoteApprovalDialog";
 import { InvoicePaymentDialog } from "@/components/InvoicePaymentDialog";
+import Header from "@/components/Header";
 
 const CustomerPortal = () => {
   const { user, signOut } = useAuth();
@@ -168,20 +169,7 @@ const CustomerPortal = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Customer Portal</h1>
-            <p className="text-muted-foreground">
-              Welcome back, {customerData.client.name}
-            </p>
-          </div>
-          <Button onClick={signOut} variant="outline">
-            Sign Out
-          </Button>
-        </div>
-      </div>
+      <Header />
 
       <div className="container mx-auto px-4 py-6 space-y-6">
         {/* Overview Cards */}
