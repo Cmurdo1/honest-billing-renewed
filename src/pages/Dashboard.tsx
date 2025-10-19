@@ -10,7 +10,7 @@ import Quotes from "./dashboard/Quotes";
 import Invoices from "./dashboard/Invoices";
 import TimeTracking from "./dashboard/TimeTracking";
 import Expenses from "./dashboard/Expenses";
-import Reports from "./dashboard/Reports";
+import Reports from "./dashboard/Overview";
 import PaymentReminders from "./dashboard/PaymentReminders";
 import RecurringInvoices from "./dashboard/RecurringInvoices";
 import Settings from "./dashboard/Settings";
@@ -33,7 +33,7 @@ const updateSeo = (title: string, description: string) => {
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const [searchParams] = useSearchParams();
-  const defaultTab = searchParams.get('tab') || 'overview';
+  const defaultTab = searchParams.get('tab') || 'reports';
 
   useEffect(() => {
     updateSeo(
@@ -75,7 +75,7 @@ const Dashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue={defaultTab}>
+        <Tabs defaultValue="reports">
           <div className="mb-6 sm:mb-8">
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:flex lg:w-auto lg:justify-center gap-1 h-auto p-1">
               <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Overview</TabsTrigger>
@@ -85,7 +85,7 @@ const Dashboard = () => {
               <TabsTrigger value="time" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Time</TabsTrigger>
               <TabsTrigger value="expenses" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Expenses</TabsTrigger>
               <TabsTrigger value="reminders" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Reminders</TabsTrigger>
-              <TabsTrigger value="reports" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Reports</TabsTrigger>
+              <TabsTrigger value="reports" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0" defaultChecked>Reports</TabsTrigger>
               <TabsTrigger value="settings" className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex-shrink-0">Settings</TabsTrigger>
             </TabsList>
           </div>
