@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SubscriptionStatus from "@/components/SubscriptionStatus";
-import Overview from "./dashboard/Overview";
+import Overview from "./dashboard/Reports";
 import Clients from "./dashboard/Clients";
 import Quotes from "./dashboard/Quotes";
 import Invoices from "./dashboard/Invoices";
