@@ -4,14 +4,17 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(() => ({
+  // Use consistent base path for identical builds in both dev and production
+  base: '/',
   server: {
     host: "127.0.0.1",
     port: 5173,
   },
   build: {
     outDir: 'dist',
-    sourcemap: mode === 'development',
+    sourcemap: false,
+    minify: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -24,7 +27,6 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
   resolve: {
