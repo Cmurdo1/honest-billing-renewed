@@ -55,6 +55,26 @@ serve(async (req) => {
       console.error('Could not fetch user settings:', settingsError.message);
     }
 
+    // 4. Get invoice items
+    const { data: items, error: itemsError } = await supabase
+      .from('invoice_items')
+      .select('description, quantity, unit_price')
+      .eq('invoice_id', invoiceId);
+
+    if (itemsError) {
+      // Not a fatal error, we can proceed without items, but we should log it
+      console.error('Could not fetch invoice items:', itemsError.message);
+    }
+
+    const itemsHtml = items?.map(item => `
+      <tr>
+        <td>${item.description}</td>
+        <td>${item.quantity}</td>
+        <td>$${Number(item.unit_price).toFixed(2)}</td>
+        <td>$${(Number(item.quantity) * Number(item.unit_price)).toFixed(2)}</td>
+      </tr>
+    `).join('') || '';
+
     // Generate HTML for PDF
     const html = `
       <!DOCTYPE html>
@@ -118,23 +138,28 @@ serve(async (req) => {
           <thead>
             <tr>
               <th>Description</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
               <th>Amount</th>
             </tr>
           </thead>
           <tbody>
+            ${itemsHtml}
+          </tbody>
+          <tfoot>
             <tr>
-              <td>Subtotal</td>
-              <td>$${Number(invoice.subtotal).toFixed(2)}</td>
+              <td colspan="3" style="text-align: right;"><strong>Subtotal</strong></td>
+              <td><strong>$${Number(invoice.subtotal).toFixed(2)}</strong></td>
             </tr>
             <tr>
-              <td>Tax</td>
-              <td>$${Number(invoice.tax).toFixed(2)}</td>
+              <td colspan="3" style="text-align: right;"><strong>Tax</strong></td>
+              <td><strong>$${Number(invoice.tax).toFixed(2)}</strong></td>
             </tr>
             <tr class="total-row">
-              <td><strong>Total</strong></td>
+              <td colspan="3" style="text-align: right;"><strong>Total</strong></td>
               <td><strong>$${Number(invoice.total).toFixed(2)}</strong></td>
             </tr>
-          </tbody>
+          </tfoot>
         </table>
         
         <div style="margin-top: 40px; text-align: center; color: #666;">

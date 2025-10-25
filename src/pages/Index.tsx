@@ -107,7 +107,7 @@ const Index = () => {
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">HI</span>
             <span className="font-semibold">HonestInvoice</span>
           </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
+          <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground ml-6">
             <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-foreground">Features</button>
             <button onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-foreground">Pricing</button>
           </nav>
