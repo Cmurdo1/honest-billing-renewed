@@ -11,12 +11,18 @@ export const cleanupAuthState = () => {
     });
 
     // Remove from sessionStorage if in use
-    try {
-      Object.keys(sessionStorage || {}).forEach((key) => {
-        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-          sessionStorage.removeItem(key);
-        }
-      });
-    } catch {}
-  } catch {}
+    if (typeof sessionStorage !== 'undefined') {
+      try {
+        Object.keys(sessionStorage).forEach((key) => {
+          if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+            sessionStorage.removeItem(key);
+          }
+        });
+      } catch (e) {
+        console.error("Error cleaning up sessionStorage:", e);
+      }
+    }
+  } catch (e) {
+    console.error("Error cleaning up auth state:", e);
+  }
 };
